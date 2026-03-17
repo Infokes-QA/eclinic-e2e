@@ -1,6 +1,6 @@
 Feature: Login
 
-@login @smoke @sanity
+@login @smoke @sanity @epus
 Scenario: User can login with valid credentials
     Given user navigates to login page
     When user enters valid username and password
