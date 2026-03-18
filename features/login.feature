@@ -1,10 +1,11 @@
-Feature: Login
+Feature: Eclinic Login
 
-@login @smoke @sanity @epus
-Scenario: User can login with valid credentials
-    Given user navigates to login page
-    When user enters valid username and password
-    And user clicks login button
-    Then user will be directed to the select puskesmas page
-    When user selects puskesmas
-    Then user will be directed to the home page
+  As a user
+  I want to login to Eclinic
+  So that I can access the dashboard
+
+  @login @smoke @sanity @eclinic
+  Scenario: User logs in with valid credentials
+    Given user is on the eclinic login page
+    When user logs in with valid credentials
+    Then user should be redirected to the eclinic home page

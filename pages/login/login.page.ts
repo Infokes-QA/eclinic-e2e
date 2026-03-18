@@ -1,31 +1,34 @@
-import type { Locator, Page } from '@playwright/test';
-import { BasePage } from '../base.pages';
+import { Page } from '@playwright/test';
+import { loginLocators } from './login.locators';
 
-export class LoginPage extends BasePage {
-    readonly kolomIdPengguna: Locator;
-    readonly kolomKataSandi: Locator;
-    readonly tombolLogin: Locator;
+export class LoginPage {
+  constructor(private page: Page) {}
 
-    constructor(page: Page) {
-        super(page);
-        this.kolomIdPengguna = this.page.getByPlaceholder('E-mail / No. HP / ID');
-        this.kolomKataSandi = this.page.getByPlaceholder('kata kunci');
-        this.tombolLogin = this.page.getByRole('button', { name: 'Login' });
-    }
+  async goto() {
+    await this.page.goto('/login');
+    await this.page.locator(loginLocators.usernameInput).waitFor();
+  }
 
-    async kunjungiHalaman() {
-        await this.goto('/login');
-    }
+  async selectKlinik(klinik: string) {
+    const inputKlinik = this.page.locator(loginLocators.klinikInput);
 
-    async isikanIdPengguna(idPengguna: string) {
-        await this.fill(this.kolomIdPengguna, idPengguna);
-    }
+    await inputKlinik.waitFor({ state: 'visible' });
+    await inputKlinik.click();
+    await inputKlinik.fill(klinik);
 
-    async isikanKataSandi(kataSandi: string) {
-        await this.fill(this.kolomKataSandi, kataSandi);
-    }
+    const suggestion = this.page.locator(
+      loginLocators.klinikSuggestion(klinik)
+    ).first();
 
-    async klikTombolLogin() {
-        await this.click(this.tombolLogin);
-    }
+    await suggestion.click();
+  }
+
+  async login(username: string, password: string, klinik: string) {
+    await this.selectKlinik(klinik);
+
+    await this.page.locator(loginLocators.usernameInput).fill(username);
+    await this.page.locator(loginLocators.passwordInput).fill(password);
+
+    await this.page.locator(loginLocators.loginButton).click();
+  }
 }

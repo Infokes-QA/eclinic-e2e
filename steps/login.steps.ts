@@ -1,35 +1,25 @@
 import { createBdd } from 'playwright-bdd';
+import { expect } from '@playwright/test';
 import { LoginPage } from '../pages/login/login.page';
-import { SelectPuskesmasPage } from '../pages/login/select.puskesmas.page';
-
 
 const { Given, When, Then } = createBdd();
 
-Given('user navigates to login page', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.kunjungiHalaman();
+let loginPage: LoginPage;
+
+Given('user is on the eclinic login page', async ({ page }) => {
+  loginPage = new LoginPage(page);
+  await loginPage.goto();
 });
 
-When('user enters valid username and password', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    const username = process.env.EC_USERNAME!;
-    const password = process.env.EC_PASSWORD!;
-
-    await loginPage.isikanIdPengguna(username);
-    await loginPage.isikanKataSandi(password);
+When('user logs in with valid credentials', async () => {
+  await loginPage.login(
+    process.env.EC_USERNAME!,
+    process.env.EC_PASSWORD!,
+    process.env.EC_FASKES!
+  );
 });
 
-When('user clicks login button', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.klikTombolLogin();
+Then('user should be redirected to the eclinic home page', async ({ page }) => {
+  await page.waitForLoadState('networkidle');
+  await expect(page).toHaveURL(/\/home/);
 });
-
-Then('user will be directed to the select puskesmas page', async ({ page }) => {
-    const selectPuskesmasPage = new SelectPuskesmasPage(page);
-    await selectPuskesmasPage.lihatJudulPuskesmas();
-});
-
-When('user selects puskesmas', async ({ page }) => {
-    const selectPuskesmasPage = new SelectPuskesmasPage(page);
-    await selectPuskesmasPage.pilihPuskesmas();
-})
