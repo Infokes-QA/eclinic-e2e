@@ -1,5 +1,6 @@
 import { createBdd } from 'playwright-bdd';
 import { CreatePasienPage } from '../pages/pasien/createPasien.page';
+import { PasienListPage } from '../pages/pasien/pasienList.page';
 import { createPasienLaki, createPasienPerempuan } from '../data/pasien.data';
 import { Pasien } from '../data/interfaces/pasien';
 import { LoginPage } from '../pages/login/login.page';
@@ -47,6 +48,14 @@ When(
 );
 
 // THEN
-Then('pasien should be successfully created', async () => {
+Then('pasien should be successfully created', async ({ page }) => {
   await createPasienPage.verifySuccess();
+
+  // After create, ensure the newly created patient is discoverable on list page by NIK.
+  if (!currentData?.nik) throw new Error('Test data NIK is missing');
+
+  const pasienListPage = new PasienListPage(page);
+  await pasienListPage.gotoBroadcastNotif();
+  await pasienListPage.searchByNik(currentData.nik);
+  await pasienListPage.expectPasienVisibleByNik(currentData.nik);
 });
