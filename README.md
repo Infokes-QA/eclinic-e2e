@@ -92,7 +92,13 @@ npm run test:tag
 ### 5. Run specific tag (example)
 
 ```bash
-npx playwright test --grep @create-pasien
+npx playwright test --grep @pasien
+```
+
+### 6. Run without parallel (non-parallel)
+Jika ingin memastikan skenario tidak berjalan paralel (mis. saat test bergantung data dinamis), gunakan 1 worker:
+```bash
+npm test -- --grep @pasien --project=chromium --headed --workers=1
 ```
 
 ---
@@ -104,7 +110,7 @@ Use tags in feature files to organize tests:
 * `@smoke` → critical flow
 * `@sanity` → basic validation
 * `@eclinic` → environment specific
-* `@create-pasien` → feature specific
+* `@pasien` → feature specific
 
 ---
 
@@ -142,6 +148,7 @@ Implemented test scenarios:
 
 * ✅ Login Eclinic
 * ✅ Create pasien umum (laki-laki & perempuan)
+* ✅ Setelah create: pasien bisa ditemukan di `/pasien?broadcastNotif=1` dengan pencarian `NIK`
 * ✅ Scenario Outline with dynamic data
 
 ---
