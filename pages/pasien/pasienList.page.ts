@@ -1,10 +1,11 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import { pasienListLocators } from './pasienList.locators';
 
 export class PasienListPage {
   constructor(private page: Page) {}
 
   async gotoBroadcastNotif() {
-    await this.page.goto('/pasien?broadcastNotif=1');
+    await this.page.goto(pasienListLocators.broadcastNotifPath);
     await this.page.waitForLoadState('networkidle').catch(() => {});
     await this.waitForPencarianAndTable();
   }
@@ -12,7 +13,7 @@ export class PasienListPage {
   private async waitForPencarianAndTable() {
     const pencarianInput = await this.resolvePencarianInput();
     await pencarianInput.waitFor({ state: 'visible', timeout: 30_000 });
-    await this.page.locator('table').first().waitFor({ state: 'visible', timeout: 30_000 });
+    await this.page.locator(pasienListLocators.tableSelector).first().waitFor({ state: 'visible', timeout: 30_000 });
   }
 
   async searchByNik(nik: string) {
@@ -20,7 +21,7 @@ export class PasienListPage {
     const pencarianInput = await this.resolvePencarianInput();
     await pencarianInput.fill(nik);
 
-    const cariButton = this.page.getByRole('button', { name: /^Cari$/i }).first();
+    const cariButton = this.page.getByRole('button', { name: pasienListLocators.cariButtonNameRegex }).first();
     if ((await cariButton.count()) > 0) {
       await cariButton.click();
     } else {
@@ -52,13 +53,13 @@ export class PasienListPage {
   }
 
   private async resolvePencarianInput(): Promise<Locator> {
-    const byRole = this.page.getByRole('textbox', { name: /pencarian/i }).first();
+    const byRole = this.page.getByRole('textbox', { name: pasienListLocators.pencarianLabelRegex }).first();
     if ((await byRole.count()) > 0 && (await byRole.isVisible().catch(() => false))) return byRole;
 
-    const byPlaceholder = this.page.locator('input[placeholder*="Pencarian" i]').first();
+    const byPlaceholder = this.page.locator(pasienListLocators.pencarianPlaceholderSelector).first();
     if ((await byPlaceholder.count()) > 0 && (await byPlaceholder.isVisible().catch(() => false))) return byPlaceholder;
 
-    const byName = this.page.locator('input[name*="pencarian" i], input[name*="search" i]').first();
+    const byName = this.page.locator(pasienListLocators.pencarianNameSelector).first();
     if ((await byName.count()) > 0 && (await byName.isVisible().catch(() => false))) return byName;
 
     // Fallback: role locator (will fail with a better timeout message later).

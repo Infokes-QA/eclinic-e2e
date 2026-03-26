@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { Pasien } from '../../data/interfaces/pasien';
+import { createPasienLocators } from './createPasien.locators';
 
 export class CreatePasienPage {
   constructor(private page: Page) {}
@@ -10,20 +11,20 @@ export class CreatePasienPage {
   }
 
   async openCreatePasienForm() {
-    await this.page.getByRole('button', { name: /buat pasien baru/i }).click();
+    await this.page.getByRole('button', { name: createPasienLocators.openCreatePasienButtonName }).click();
   }
 
   async waitForFormReady() {
-    await this.page.getByPlaceholder('Nomor Induk Kependudukan (KTP)').waitFor();
+    await this.page.getByPlaceholder(createPasienLocators.nikPlaceholder).waitFor();
   }
 
   async fillForm(data: Pasien) {
-    await this.page.getByPlaceholder('Nomor Induk Kependudukan (KTP)').fill(data.nik);
-    await this.page.getByPlaceholder('Nama lengkap').fill(data.nama);
+    await this.page.getByPlaceholder(createPasienLocators.nikPlaceholder).fill(data.nik);
+    await this.page.getByPlaceholder(createPasienLocators.namaPlaceholder).fill(data.nama);
 
     const dialog = this.page.getByRole('dialog');
 
-    const dob = dialog.getByPlaceholder('dd-mm-yyyy');
+    const dob = dialog.getByPlaceholder(createPasienLocators.dobPlaceholder);
 
     await dob.waitFor({ state: 'visible' });
     await dob.scrollIntoViewIfNeeded();
@@ -31,27 +32,27 @@ export class CreatePasienPage {
     await dob.fill(data.tanggalLahir); // YYYY-MM-DD
     await dob.press('Tab');
 
-    await this.page.getByPlaceholder('Alamat Domisili').fill(data.alamat);
-    await this.page.getByPlaceholder('Nomor HP').fill(data.noHp);
+    await this.page.getByPlaceholder(createPasienLocators.alamatPlaceholder).fill(data.alamat);
+    await this.page.getByPlaceholder(createPasienLocators.noHpPlaceholder).fill(data.noHp);
 
     await this.selectGender(data.gender);
   }
 
   async selectGender(gender: 'L' | 'P') {
     if (gender === 'L') {
-      await this.page.getByRole('radio', { name: 'Laki-laki' }).check();
+      await this.page.getByRole('radio', { name: createPasienLocators.genderLRadioName }).check();
     } else {
-      await this.page.getByRole('radio', { name: 'Perempuan' }).check();
+      await this.page.getByRole('radio', { name: createPasienLocators.genderPRadioName }).check();
     }
   }
 
   async submit() {
-    await this.page.getByRole('button', { name: /simpan pasien/i }).click();
+    await this.page.getByRole('button', { name: createPasienLocators.simpanPasienButtonName }).click();
   }
 
   async verifySuccess() {
     await expect(
-  this.page.locator('[data-notify="message"]')
-).toHaveText(/Data berhasil disimpan/i);
+      this.page.locator(createPasienLocators.successMessageSelector)
+    ).toHaveText(createPasienLocators.successMessageText);
   }
 }
