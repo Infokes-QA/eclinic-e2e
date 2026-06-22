@@ -1,7 +1,7 @@
 import { createBdd } from 'playwright-bdd';
 import { CreatePasienPage } from '../pages/pasien/createPasien.page';
 import { PasienListPage } from '../pages/pasien/pasienList.page';
-import { createPasienLaki, createPasienPerempuan } from '../data/pasien.data';
+import { createPasien } from '../data/pasien.data';
 import { Pasien } from '../data/interfaces/pasien';
 import { LoginPage } from '../pages/login/login.page';
 
@@ -12,7 +12,7 @@ let currentData: Pasien;
 
 // GIVEN
 
-Given('user is on create pasien page', async ({ page }) => {
+Given('user berada di halaman tambah pasien', async ({ page }) => {
   
   // login dulu
   const loginPage = new LoginPage(page);
@@ -32,23 +32,15 @@ Given('user is on create pasien page', async ({ page }) => {
 });
 
 // WHEN
-When(
-  'user creates pasien with data {string}',
-  async ({}, type: 'laki' | 'perempuan') => {
-    const dataMap = {
-      laki: createPasienLaki,
-      perempuan: createPasienPerempuan
-    };
+When('user membuat data pasien', async () => {
+  currentData = createPasien();
 
-    currentData = dataMap[type]();
-
-    await createPasienPage.fillForm(currentData);
-    await createPasienPage.submit();
-  }
-);
+  await createPasienPage.fillForm(currentData);
+  await createPasienPage.submit();
+});
 
 // THEN
-Then('pasien should be successfully created', async ({ page }) => {
+Then('data pasien berhasil dibuat', async ({ page }) => {
   await createPasienPage.verifySuccess();
 
   // After create, ensure the newly created patient is discoverable on list page by NIK.
