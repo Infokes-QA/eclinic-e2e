@@ -10,3 +10,6 @@ node_modules/
 /allure-results/
 /allure-report/
 /storage/auth.json
+/.env
+/.env.eclinic
+/.env.example
