@@ -19,7 +19,15 @@ export class BasePage {
     await expect(locator).toBeVisible();
   }
 
-  async expectUrlNotContains(text: string): Promise<void> {
-    await expect(this.page).not.toHaveURL(new RegExp(text));
+  async expectTextContains(locator: Locator, text: string): Promise<void> {
+    await expect(locator).toContainText(text);
+  }
+
+  async expectUrlMatches(pattern: RegExp, timeout?: number): Promise<void> {
+    await expect(this.page).toHaveURL(pattern, timeout ? { timeout } : undefined);
+  }
+
+  async expectUrlNotContains(text: string, timeout?: number): Promise<void> {
+    await expect(this.page).not.toHaveURL(new RegExp(text), timeout ? { timeout } : undefined);
   }
 }

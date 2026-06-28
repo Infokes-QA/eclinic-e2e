@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import { ENV } from "../../config/env";
 import { UrlHelper } from "../../config/url";
 import { LoginLocator } from "../../locators/authentication/login.locator";
@@ -29,32 +29,27 @@ export class LoginPage extends BasePage {
   }
 
   async verifyLoginSuccess(): Promise<void> {
-    await expect(this.page).not.toHaveURL(/\/login/, {
-      timeout: ENV.TIMEOUT,
-    });
+    await this.expectUrlNotContains("/login", ENV.TIMEOUT);
   }
+
   async selectClinic(clinicName: string): Promise<void> {
     await this.clinicInput.click();
     await this.clinicInput.clear();
-    await this.clinicInput.fill(clinicName);
+    await this.fill(this.clinicInput, clinicName);
     await this.page.keyboard.press("ArrowDown");
     await this.page.keyboard.press("Enter");
   }
 
   async fillUsername(username: string): Promise<void> {
-    await this.usernameInput.click();
-    await this.usernameInput.clear();
-    await this.usernameInput.fill(username);
+    await this.fill(this.usernameInput, username);
   }
 
   async fillPassword(password: string): Promise<void> {
-    await this.passwordInput.click();
-    await this.passwordInput.clear();
-    await this.passwordInput.fill(password);
+    await this.fill(this.passwordInput, password);
   }
 
   async clickLoginButton(): Promise<void> {
-    await this.loginButton.click();
+    await this.click(this.loginButton);
   }
 
   async loginAs(user: UserCredential): Promise<void> {
@@ -65,13 +60,13 @@ export class LoginPage extends BasePage {
   }
 
   async verifyNotificationMessage(message: string): Promise<void> {
-    await expect(this.notification).toBeVisible();
-    await expect(this.notificationMessage).toContainText(message);
+    await this.expectVisible(this.notification);
+    await this.expectTextContains(this.notificationMessage, message);
   }
 
   async verifyLoginErrorDisplayed(): Promise<void> {
-    await expect(this.notification).toBeVisible();
-    await expect(this.page).toHaveURL(/\/login/);
+    await this.expectVisible(this.notification);
+    await this.expectUrlMatches(/\/login/);
   }
 
   async verifyLoginPageDisplayed(): Promise<void> {
