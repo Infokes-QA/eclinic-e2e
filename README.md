@@ -17,37 +17,45 @@ npm install
 npx playwright install
 ```
 
+Di PowerShell, kalau `npm` atau `npx` diblokir oleh execution policy, pakai `npm.cmd` dan `npx.cmd`.
+
 ## Environment
 
-Copy file contoh environment lalu isi sesuai kebutuhan:
+Konfigurasi dibaca dari `.env` lewat `src/config/env.ts`.
 
-```bash
-cp .env.example .env
-```
+Environment yang valid:
 
-Variabel yang dipakai oleh kode ada di `src/config/env.ts`.
+- `DEV1`
+- `DEV2`
+- `DEV3`
+- `DEV4`
+- `UAT`
 
-| Variable           | Fungsi                                                                        |
-| ------------------ | ----------------------------------------------------------------------------- |
-| `ENVIRONMENT`      | Menentukan base URL environment yang dipakai oleh `UrlHelper`, contoh `dev4`. |
-| `CLINIC_NAME`      | Nama klinik/faskes yang dipilih saat login.                                   |
-| `ECLINIC_USERNAME` | Username akun eClinic.                                                        |
-| `ECLINIC_PASSWORD` | Password akun eClinic.                                                        |
-| `HEADLESS`         | Menjalankan browser tanpa UI jika `true`.                                     |
-| `BROWSER`          | Browser yang dipakai, `chromium`, `firefox`, atau `webkit`.                   |
-| `TIMEOUT`          | Timeout Playwright dan Cucumber dalam milidetik.                              |
+Pola variabel yang dipakai kode saat ini:
 
-Contoh isi `.env`:
+- `ENVIRONMENT`
+- `${ENVIRONMENT}_BASE_URL`
+- `${ENVIRONMENT}_CLINIC`
+- `${ENVIRONMENT}_USERNAME`
+- `${ENVIRONMENT}_PASSWORD`
+- `HEADLESS`
+- `BROWSER`
+- `TIMEOUT`
+
+Contoh:
 
 ```env
-ENVIRONMENT=dev4
-CLINIC_NAME=Nama Klinik
-ECLINIC_USERNAME=admin@example.com
-ECLINIC_PASSWORD=password
+ENVIRONMENT=DEV4
+DEV4_BASE_URL=https://example.com
+DEV4_CLINIC=Nama Klinik
+DEV4_USERNAME=admin@example.com
+DEV4_PASSWORD=password
 HEADLESS=true
 BROWSER=chromium
 TIMEOUT=30000
 ```
+
+Catatan: jika file `.env.example` masih memakai akhiran `_URL`, sesuaikan dengan pola `_BASE_URL` yang dipakai `src/config/env.ts`.
 
 ## Script NPM
 
@@ -68,6 +76,15 @@ TIMEOUT=30000
 
 Entry point test ada di `src/runner/runner.ts`.
 
+Argumen yang tersedia:
+
+- `--feature` untuk menjalankan satu feature file relatif ke folder `features/`
+- `--module` untuk menjalankan semua feature dalam satu folder module di `features/`
+- `--tags` untuk menjalankan scenario berdasarkan tag
+- `--headed` untuk menampilkan browser
+
+Contoh:
+
 ```bash
 npm run e2e
 npm run e2e -- --headed
@@ -77,16 +94,19 @@ npm run e2e -- --tags="@smoke"
 npm run e2e -- --module=authentication --tags="@smoke"
 ```
 
-Argumen yang tersedia:
+## Route dan URL
 
-- `--feature` untuk menjalankan satu feature file
-- `--module` untuk menjalankan semua feature dalam satu folder module
-- `--tags` untuk menjalankan scenario berdasarkan tag
-- `--headed` untuk menampilkan browser
+`src/config/routes.ts` menyimpan key route, misalnya `login`.
+
+`src/config/url.ts` memakai `UrlHelper.get(route)` untuk menggabungkan `ENV.BASE_URL` dengan path route dari `ROUTES`.
+
+Contoh:
+
+```ts
+UrlHelper.get("login");
+```
 
 ## Struktur Folder dan File
-
-Struktur source yang dipakai saat ini:
 
 ```text
 eclinic-e2e/
