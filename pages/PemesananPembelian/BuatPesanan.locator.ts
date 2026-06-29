@@ -7,6 +7,7 @@ export const BuatPesananLocators = (page: any) => ({
     FieldPenanggungJawab: page.getByPlaceholder('Nama Penanggung Jawab'),
     FieldDiskonKeseluruhan: page.getByLabel('Diskon Keseluruhan'),
     DiskonkeseluruhanPersen: page.getByLabel('Persentase'),
+    JumlahPersenDiskon: page.locator('.form-group').filter({ hasText: 'Nilai Diskon' }).locator('input'),
     DiskonkeseluruhanRupiah: page.getByLabel('Nilai Rupiah'),
     FieldDiskonPerItem: page.getByLabel('Diskon Per-Item'),
     FieldTanpaDiskon: page.getByLabel('Tanpa Diskon'),
@@ -16,6 +17,8 @@ export const BuatPesananLocators = (page: any) => ({
     TombolTambahkanItem: page.getByRole('button', { name: 'Tambahkan Item' }),
     TombolReset: page.getByRole('button', { name: 'Reset' }),
     TombolSimpanDraft: page.getByRole('button', { name: 'Simpan Draft' }),
-    TombolSimpanKirim: page.getByRole('button', { name: 'Simpan & Kirim' })
+    TombolSimpanKirim: page.getByRole('button', { name: 'Simpan & Kirim' }),
+    FieldTotalDiskon: page.getByText('Total Diskon').locator('..').locator('div.col-md-9'),
+    FieldTotalHarga: page.getByText('Total Harga').locator('..').locator('div.col-md-9'),
   
 });

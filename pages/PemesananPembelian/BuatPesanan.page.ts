@@ -45,8 +45,38 @@ export class BuatPesananPage {
         await this.page.locator(".ui-menu-item").first().click();
     }
 
+    async fillObat() {
+        await this.locators.FieldNamaObatAlkes.fill("Paracetamol");
+        await this.page.waitForSelector(".ui-menu-item");
+        await this.page.locator(".ui-menu-item").first().click();
+    }
+
     async fillJumlahOrder(jumlah_order: string) {
         await this.locators.JumlahOrder.fill(jumlah_order);
+    }
+
+    async selectDiskonKeseluruhan() {
+        await this.locators.FieldDiskonKeseluruhan.click();
+    }
+
+    async selectpersenDiskonKeseluruhan() {
+        await this.locators.DiskonkeseluruhanPersen.click();
+    }
+
+    async filljumlahdiskonpersen(diskon: string) {
+        await this.locators.JumlahPersenDiskon.fill(diskon);
+    }
+
+    async jumlahpesan() {
+        return await this.locators.JumlahOrder.inputValue();
+    }
+
+    async verifyJumlahDiskonPersen(jumlah_diskon: string) {
+        await expect(this.locators.FieldTotalDiskon).toHaveValue(jumlah_diskon);
+    }
+
+    async verifyJumlahHarga(jumlah_harga: string) {
+        await expect(this.locators.FieldTotalHarga).toHaveValue(jumlah_harga);
     }
 
     async clickTambahkanItem() {
@@ -63,4 +93,6 @@ export class BuatPesananPage {
 
         await expect(row).toContainText(jumlah_Order);
     }
+
+    
 };
