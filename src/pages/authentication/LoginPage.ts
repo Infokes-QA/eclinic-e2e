@@ -1,9 +1,11 @@
 import { Locator, Page } from "@playwright/test";
 import { ENV } from "../../config/env";
 import { UrlHelper } from "../../config/url";
+import { LoginData } from "../../data/authentication/login.data";
 import { LoginLocator } from "../../locators/authentication/login.locator";
 import { UserCredential } from "../../types/user.type";
 import { BasePage } from "../base/BasePage";
+import { SweetAlertComponent } from "../components/SweetAlertComponent";
 
 export class LoginPage extends BasePage {
   readonly clinicInput: Locator;
@@ -12,6 +14,7 @@ export class LoginPage extends BasePage {
   readonly loginButton: Locator;
   readonly notification: Locator;
   readonly notificationMessage: Locator;
+  readonly sweetAlert: SweetAlertComponent;
 
   constructor(page: Page) {
     super(page);
@@ -22,6 +25,7 @@ export class LoginPage extends BasePage {
     this.loginButton = page.locator(LoginLocator.loginPageEclinic.loginButton);
     this.notification = page.locator(LoginLocator.loginPageEclinic.notification);
     this.notificationMessage = page.locator(LoginLocator.loginPageEclinic.notificationMessage);
+    this.sweetAlert = new SweetAlertComponent(page);
   }
 
   async openLoginPage(): Promise<void> {
@@ -30,6 +34,7 @@ export class LoginPage extends BasePage {
 
   async verifyLoginSuccess(): Promise<void> {
     await this.expectUrlNotContains("/login", ENV.TIMEOUT);
+    await this.sweetAlert.closeIfVisible();
   }
 
   async selectClinic(clinicName: string): Promise<void> {
@@ -59,13 +64,9 @@ export class LoginPage extends BasePage {
     await this.clickLoginButton();
   }
 
-  async verifyNotificationMessage(message: string): Promise<void> {
-    await this.expectVisible(this.notification);
-    await this.expectTextContains(this.notificationMessage, message);
-  }
-
   async verifyLoginErrorDisplayed(): Promise<void> {
     await this.expectVisible(this.notification);
+    await this.expectTextContains(this.notificationMessage, LoginData.message.invalidCredential);
     await this.expectUrlMatches(/\/login/);
   }
 

@@ -23,10 +23,10 @@ Before(async function (this: CustomWorld) {
 After(async function (this: CustomWorld, scenario) {
   const scenarioName = scenario.pickle.name.replace(/[^a-zA-Z0-9]/g, "-");
 
-  const screenshot = await ScreenshotHelper.capture(this.page, scenarioName);
-  await this.attach(screenshot, "image/png");
-
   if (scenario.result?.status === Status.FAILED) {
+    const screenshot = await ScreenshotHelper.capture(this.page, scenarioName);
+    await this.attach(screenshot, "image/png");
+
     await this.context.tracing.stop({
       path: `test-results/traces/${scenarioName}.zip`,
     });

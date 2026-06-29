@@ -47,8 +47,11 @@ export class LandingPage extends BasePage {
     }
 
     const submenuLocator = selectedMenu.submenu[submenu as keyof typeof selectedMenu.submenu];
+    const submenuElement = this.page.locator(submenuLocator);
 
-    await this.page.locator(submenuLocator).click();
+    await this.page.locator(selectedMenu.title).hover();
+    await expect(submenuElement).toBeVisible();
+    await submenuElement.click();
   }
 
   private getMenu(menu: string) {

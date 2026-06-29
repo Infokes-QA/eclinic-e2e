@@ -1,5 +1,4 @@
 import { Then, When } from "@cucumber/cucumber";
-
 import { Users } from "../../fixtures/users.fixture";
 import { CustomWorld } from "../../support/world";
 
@@ -31,10 +30,6 @@ When("user menekan tombol Login", async function (this: CustomWorld) {
 
 Then("user berhasil masuk ke Halaman Dashboard", async function (this: CustomWorld) {
   await this.loginPage.verifyLoginSuccess();
-});
-
-Then("sistem menampilkan pesan {string}", async function (this: CustomWorld, message: string) {
-  await this.loginPage.verifyNotificationMessage(message);
 });
 
 Then("sistem menampilkan pesan error login", async function (this: CustomWorld) {
