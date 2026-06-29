@@ -55,7 +55,7 @@ BROWSER=chromium
 TIMEOUT=30000
 ```
 
-Catatan: jika file `.env.example` masih memakai akhiran `_URL`, sesuaikan dengan pola `_BASE_URL` yang dipakai `src/config/env.ts`.
+Catatan: salin `.env.example` ke `.env`, lalu isi nilai sesuai environment yang dipakai.
 
 ## Script NPM
 
@@ -71,6 +71,7 @@ Catatan: jika file `.env.example` masih memakai akhiran `_URL`, sesuaikan dengan
 | `npm run format`        | Format seluruh file dengan Prettier.               |
 | `npm run format:check`  | Cek format tanpa mengubah file.                    |
 | `npm run check`         | Menjalankan lint dan type-check.                   |
+| `npm run report:open`   | Membuka laporan Cucumber HTML di browser.          |
 
 ## Cara Menjalankan Test
 
@@ -88,11 +89,33 @@ Contoh:
 ```bash
 npm run e2e
 npm run e2e -- --headed
+npm run test:headed
+npm run test:headed -- --feature=authentication/login.feature
 npm run e2e -- --feature=authentication/login.feature
 npm run e2e -- --module=authentication
 npm run e2e -- --tags="@smoke"
 npm run e2e -- --module=authentication --tags="@smoke"
 ```
+
+## Alur Aplikasi Saat Ini
+
+Automation login dimulai dari Landing Page.
+
+1. Buka Landing Page menggunakan `ENV.BASE_URL`.
+2. Hover menu landing.
+3. Pilih submenu.
+4. Pastikan halaman Login tampil.
+5. Login menggunakan fixture user atau data invalid.
+6. Verifikasi dashboard sukses atau pesan error login.
+
+Feature yang tersedia:
+
+- `features/authentication/login.feature`
+
+Scenario saat ini:
+
+- Login berhasil menggunakan akun Admin (`@smoke @login @positive`)
+- Login gagal menggunakan data invalid (`@login @negative`)
 
 ## Route dan URL
 
@@ -133,13 +156,17 @@ eclinic-e2e/
 |   |-- locators/
 |   |   |-- authentication/
 |   |   |   `-- login.locator.ts
-|   |   `-- landing/
-|   |       `-- landing.locator.ts
+|   |   |-- landing/
+|   |   |   `-- landing.locator.ts
+|   |   `-- shared/
+|   |       `-- sweet-alert.locator.ts
 |   |-- pages/
 |   |   |-- authentication/
 |   |   |   `-- LoginPage.ts
 |   |   |-- base/
 |   |   |   `-- BasePage.ts
+|   |   |-- components/
+|   |   |   `-- SweetAlertComponent.ts
 |   |   `-- landing/
 |   |       `-- LandingPage.ts
 |   |-- runner/
@@ -171,7 +198,9 @@ eclinic-e2e/
 - `src/fixtures/` -> input test data
 - `src/helpers/` -> helper reusable
 - `src/locators/` -> selector saja, tanpa logic
+- `src/locators/shared/` -> selector komponen UI yang dipakai lintas halaman
 - `src/pages/` -> Page Object berisi action, assertion, dan reusable method
+- `src/pages/components/` -> komponen UI reusable yang dipakai oleh Page Object
 - `src/runner/` -> entry point command line
 - `src/steps/` -> step definition yang hanya memanggil Page methods
 - `src/support/` -> Cucumber world, hooks, browser lifecycle, screenshot, dan trace
@@ -182,8 +211,10 @@ eclinic-e2e/
 - `features/authentication/login.feature` -> scenario login
 - `src/pages/authentication/LoginPage.ts` -> Page Object halaman login
 - `src/pages/landing/LandingPage.ts` -> Page Object halaman landing
+- `src/pages/components/SweetAlertComponent.ts` -> handler dialog SweetAlert setelah login sukses
 - `src/locators/authentication/login.locator.ts` -> selector halaman login
 - `src/locators/landing/landing.locator.ts` -> selector halaman landing
+- `src/locators/shared/sweet-alert.locator.ts` -> selector dialog SweetAlert
 - `src/data/authentication/login.data.ts` -> expected value login
 - `src/data/landing/landing.data.ts` -> expected value landing
 - `src/steps/authentication/login.steps.ts` -> step definition login
@@ -194,6 +225,7 @@ eclinic-e2e/
 
 - Folder menggunakan `kebab-case` lowercase.
 - Page Object menggunakan `PascalCase`, contoh `LoginPage.ts`.
+- Component menggunakan `PascalCase`, contoh `SweetAlertComponent.ts`.
 - Locator menggunakan `kebab-case`, contoh `login.locator.ts`.
 - Data menggunakan `kebab-case`, contoh `login.data.ts`.
 - Fixture menggunakan `kebab-case`, contoh `users.fixture.ts`.
@@ -203,7 +235,7 @@ eclinic-e2e/
 - Class, interface, type alias, dan enum menggunakan `PascalCase`.
 - Variable dan function menggunakan `camelCase`.
 - Primitive constants menggunakan `UPPER_SNAKE_CASE`.
-- Object constants menggunakan `PascalCase`, contoh `LoginData` dan `LandingPageLocator`.
+- Object constants menggunakan `PascalCase`, contoh `LoginData`, `LandingPageLocator`, dan `SweetAlertLocator`.
 
 ## Aturan Layer
 
@@ -213,6 +245,16 @@ eclinic-e2e/
 - Locator file hanya berisi selector.
 - Data file berisi expected value, bukan selector.
 - Fixture file berisi input test data, bukan assertion value.
+- Component file berisi aksi dan assertion untuk komponen UI reusable, bukan halaman penuh.
+
+## Browser dan Viewport
+
+Konfigurasi browser ada di `src/helpers/browser.helper.ts`.
+
+- Viewport default: `1920 x 1080`
+- `deviceScaleFactor: 1` untuk konsistensi tampilan di mode headed
+- Chromium memakai argumen `--force-device-scale-factor=1` agar tidak terpengaruh scaling Windows
+- Mode headed memakai `slowMo: 300` untuk memudahkan observasi manual
 
 ## Alur Test
 
@@ -223,16 +265,17 @@ eclinic-e2e/
 5. Step memanggil method di Page Object.
 6. Page Object memakai locator dan data sesuai kebutuhan.
 7. Assertion dijalankan melalui Page Object.
-8. `After` hook menutup browser dan menyimpan screenshot atau trace saat scenario gagal.
+8. `After` hook menutup browser dan menyimpan screenshot serta trace hanya saat scenario gagal.
 
 ## Catatan Pengembangan
 
 - Tambahkan feature baru di `features/<module>/`.
 - Tambahkan step definition baru di `src/steps/<module>/` atau `src/steps/<feature>.steps.ts` sesuai kebutuhan module.
-- Simpan selector baru di `src/locators/<module>/`.
+- Simpan selector baru di `src/locators/<module>/` atau `src/locators/shared/` untuk komponen lintas halaman.
 - Simpan expected value di `src/data/<module>/`.
 - Simpan input test data di `src/fixtures/`.
 - Simpan action dan assertion halaman di `src/pages/<module>/`.
+- Simpan komponen UI reusable di `src/pages/components/`.
 - Jalankan `npm run check` sebelum commit.
 
 Panduan kontribusi detail ada di [CONTRIBUTING.md](./CONTRIBUTING.md).
