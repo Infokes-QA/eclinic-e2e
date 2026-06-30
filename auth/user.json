@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "XSRF-TOKEN",
+      "value": "eyJpdiI6IjBoYjN0NUQ2N3RFRlYzSVB6NWhuOWc9PSIsInZhbHVlIjoiZjVjNURzSUU4YU1CWkVVcUlBcUMrM0pzbDJsQlJDYXhWTk9DZzgzMU4yQkx2ME9weFJQbUFQbDhhVERJVzZDeSIsIm1hYyI6IjIzY2ZhYjIzNDU0ZTRlOTc2NDI3NGE2ZjI1NDJkZTA3ZDE0NjVmOWJjZmU3YmQwODMzNzY1MTIxOGRiYzRhYTUifQ%3D%3D",
+      "domain": "dev-2.eclinic.id",
+      "path": "/",
+      "expires": 1782814315.001067,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "laravel_session",
+      "value": "eyJpdiI6IkcwUElWcXBXQ2E5TGRhSVJ5ZzJwOFE9PSIsInZhbHVlIjoiYlF5bVhYenlSNWF5cXBoU3dRcG5uQk1XeXJkUDZUVDlFZzFNUWgxMEY1Zm1yVEt1UW5hQUFSZEorbWZUSzNOakdaWTY1aUY0V1J3MTM3b1pycmJSWDNaWGhzdXBabjN3K0owSmNCMEpuNG02UCtzeUdJSllTeTV3NFJROUpNRGIiLCJtYWMiOiJiNzYzNjg3MGNiNWExMGUyZmFkNDZlMmU0OTRkMTE3NmJmNWRmN2I2OTdkODA2ZWY3Y2UzNWI1OWJlMDUwZjkzIn0%3D",
+      "domain": "dev-2.eclinic.id",
+      "path": "/",
+      "expires": 1782814315.002637,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

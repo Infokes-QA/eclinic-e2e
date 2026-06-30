@@ -56,11 +56,21 @@ export class BuatPesananPage {
     }
 
     async selectDiskonKeseluruhan() {
-        await this.locators.FieldDiskonKeseluruhan.click();
+        await this.locators.FieldDiskonKeseluruhan.check();
     }
 
     async selectpersenDiskonKeseluruhan() {
-        await this.locators.DiskonkeseluruhanPersen.click();
+        await this.locators.DiskonkeseluruhanPersen.check();
+        await expect(this.locators.DiskonkeseluruhanPersen).toBeChecked();
+        
+        await expect(this.locators.DiskonkeseluruhanRupiah).not.toBeChecked();
+    }
+
+    async selectrupiahDiskonKeseluruhan() {
+        await this.locators.DiskonkeseluruhanRupiah.check();
+        await expect(this.locators.DiskonkeseluruhanRupiah).toBeChecked();
+
+        await expect(this.locators.DiskonkeseluruhanPersen).not.toBeChecked();
     }
 
     async filljumlahdiskonpersen(diskon: string) {
@@ -72,11 +82,21 @@ export class BuatPesananPage {
     }
 
     async verifyJumlahDiskonPersen(jumlah_diskon: string) {
-        await expect(this.locators.FieldTotalDiskon).toHaveValue(jumlah_diskon);
+        const text = await this.locators.FieldTotalDiskon.textContent();
+
+        const actual = text!
+            .replace(/[^\d]/g, '');
+        
+        expect(actual).toBe(jumlah_diskon);
     }
 
     async verifyJumlahHarga(jumlah_harga: string) {
-        await expect(this.locators.FieldTotalHarga).toHaveValue(jumlah_harga);
+        const text = await this.locators.FieldTotalHarga.textContent();
+
+        const actual = text!
+            .replace(/[^\d]/g, '');
+        
+        expect(actual).toBe(jumlah_harga);
     }
 
     async clickTambahkanItem() {

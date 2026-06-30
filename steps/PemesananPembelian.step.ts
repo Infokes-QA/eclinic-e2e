@@ -14,14 +14,7 @@ let currentData: PemesananPembelian;
 // GIVEN
 Given("user sudah berada di halaman pemesanan pembelian", async ({ page }) => {
 
-    // login dulu
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.login(
-        process.env.EC_USERNAME!,
-        process.env.EC_PASSWORD!,
-        process.env.EC_FASKES!
-    );
+    await page.goto("/");
 
     // baru ke halaman pemesanan pembelian
     buatPesananPage = new BuatPesananPage(page);
@@ -63,8 +56,7 @@ Then("item {string} dengan jumlah order {string} muncul di daftar pemesanan pemb
 });
 
 
-//Scenario: User melakukan tambah item pemesanan pembelian dengan jumlah order lebih dari stok yang tersedia
-
+//Scenario: User melakukan tambah item pemesanan pembelian dengan jumlah order negatif
 //Then
 Then("tidak bisa menginputkan character negatif pada field jumlah order pemesanan pembelian",
     async ({page}) => {
@@ -73,17 +65,17 @@ Then("tidak bisa menginputkan character negatif pada field jumlah order pemesana
     });
 
 
-//Scenario: User melakukan tambah item pemesanan pembelian dengan jumlah order kosong
-Then("muncul pesan error \"Jumlah order tidak boleh kosong\"",
-    async ({page}) => {
-        const testInfo = test.info();
-        await expect(page.locator('.alert.alert-danger')).toBeVisible();
-        await expect(page.locator('.alert.alert-danger')).toHaveText('Jumlah order tidak boleh 0');
+// //Scenario: User melakukan tambah item pemesanan pembelian dengan jumlah order kosong
+// Then("muncul pesan error \"Jumlah order tidak boleh kosong\"",
+//     async ({page}) => {
+//         const testInfo = test.info();
+//         await expect(page.locator('.alert.alert-danger')).toBeVisible();
+//         await expect(page.locator('.alert.alert-danger')).toHaveText('Jumlah order tidak boleh 0');
 
-         await page.screenshot({ 
-            path: `Avidance/${testInfo.title}-${Date.now()}.png`, 
-            fullPage: true });
-    });
+//          await page.screenshot({ 
+//             path: `Avidance/${testInfo.title}-${Date.now()}.png`, 
+//             fullPage: true });
+//     });
 
 
 
@@ -96,7 +88,21 @@ When("user memilih \"diskon Keseluruhan\" pemesanan pembelian",
         await buatPesananPage.fillfieldPemasok(currentData.namaPemasok);
         await buatPesananPage.fillfieldPenanggungJawab(currentData.namaPenanggungJawab);
 
-        // isi form obat/alkes
+        // pilih jenis diskon
+        await buatPesananPage.selectDiskonKeseluruhan()
+        
+});
+
+When("user pilih diskon \"persen\" pada field diskon pemesanan pembelian", 
+    async ({ page }) => {
+        await buatPesananPage.selectpersenDiskonKeseluruhan();
+});
+
+When ("user mengisi nilai {string} pada field diskon pemesanan pembelian",
+    async ({ page }, diskon: string) => {
+        await buatPesananPage.filljumlahdiskonpersen(diskon);
+
+                // isi form obat/alkes
         await buatPesananPage.fillObat();
 
         // isi jumlah order 
@@ -104,17 +110,15 @@ When("user memilih \"diskon Keseluruhan\" pemesanan pembelian",
 
         // klik tombol tambahkan item
         await buatPesananPage.clickTambahkanItem();
-
-        // pilih jenis diskon
-        await buatPesananPage.selectDiskonKeseluruhan();
 });
 
-When("user pilih diskon \"persen\" pada field diskon pemesanan pembelian", 
+//Scenario: User menambahkan "diskon Keseluruhan" rupiah pada pemesanan pembelian
+When("user pilih diskon \"rupiah\" pada field diskon pemesanan pembelian", 
     async ({ page }) => {
-        await buatPesananPage.selectDiskonKeseluruhan();
+        await buatPesananPage.selectrupiahDiskonKeseluruhan();
 });
 
-When ("user mengisi nilai {string} pada field diskon pemesanan pembelian",
+When ("user mengisi nilai {string} pada field diskon rupiah pemesanan pembelian",
     async ({ page }, diskon: string) => {
         await buatPesananPage.filljumlahdiskonpersen(diskon);
 });

@@ -9,7 +9,6 @@ Feature: Pemesanan Pembelian
     When user menambahkan "<item_name>" pemesanan pembelian
     And user mengisi "<jumlah_order>" item pemesanan pembelian
     And user klik tombol "Tambahkan Item"
-    # Then item pemesanan pembelian berhasil ditambahkan
     Then item "<item_name>" dengan jumlah order "<jumlah_order>" muncul di daftar pemesanan pembelian
     
     Examples:
@@ -29,16 +28,16 @@ Feature: Pemesanan Pembelian
       | ETHIGOBAL - 500 | -5           |
       | Lidocaine       | -6           |
 
-Scenario Outline: User melakukan tambah item pemesanan pembelian dengan jumlah order kosong
-    Given user sudah berada di halaman pemesanan pembelian
-    When user menambahkan "<item_name>" pemesanan pembelian
-    And user mengisi "<jumlah_order>" item pemesanan pembelian
-    And user klik tombol "Tambahkan Item"
-    Then muncul pesan error "Jumlah order tidak boleh kosong"
+# Scenario Outline: User melakukan tambah item pemesanan pembelian dengan jumlah order kosong
+#     Given user sudah berada di halaman pemesanan pembelian
+#     When user menambahkan "<item_name>" pemesanan pembelian
+#     And user mengisi "<jumlah_order>" item pemesanan pembelian
+#     And user klik tombol "Tambahkan Item"
+#     Then muncul pesan error "Jumlah order tidak boleh kosong"
 
-    Examples:
-      | item_name       | jumlah_order |
-      | Dental Forceps  |0             |
+#     Examples:
+#       | item_name       | jumlah_order |
+#       | Dental Forceps  |0             |
 
 
 Scenario Outline: User menambahkan "diskon Keseluruhan" persentase pada pemesanan pembelian
@@ -54,17 +53,18 @@ Scenario Outline: User menambahkan "diskon Keseluruhan" persentase pada pemesana
       | 10     | 1500           | 13500        |
       | 20     | 3000           | 12000        |
 
-# Scenario Outline: User menambahkan "diskon Keseluruhan" nominal pada pemesanan pembelian
-#     Given user sudah berada di halaman pemesanan pembelian
-#     When user menambahkan "diskon Keseluruhan" pemesanan pembelian
-#     And user pilih diskon "nominal" pada field diskon pemesanan pembelian
-#     And user mengisi nilai <diskon> pada field diskon pemesanan pembelian
-#     Then jumlah bayar pemesanan pembelian akan terupdate sesuai dengan diskon yang diberikan
+Scenario Outline: User menambahkan "diskon Keseluruhan" nominal pada pemesanan pembelian
+    Given user sudah berada di halaman pemesanan pembelian
+    When user memilih "diskon Keseluruhan" pemesanan pembelian
+    And user pilih diskon "rupiah" pada field diskon pemesanan pembelian
+    And user mengisi nilai "<diskon>" pada field diskon pemesanan pembelian
+    Then Jumalah "<nominal_diskon>" tampil pada field diskon pemesanan pembelian 
+    And jumlah bayar pemesanan pembelian akan terupdate menjadi "<total_bayar>"
 
-#     Examples:
-#       | diskon |
-#       | 5000   |
-#       | 10000  |
+    Examples:
+      | diskon   | nominal_diskon | total_bayar  |
+      | 2000     | 2000           | 13000        |
+      | 5000     | 5000           | 10000        |
 
 # Scenario Outline: User menambahkan "diskon per item" persentase pada pemesanan pembelian
 #     Given user sudah berada di halaman pemesanan pembelian

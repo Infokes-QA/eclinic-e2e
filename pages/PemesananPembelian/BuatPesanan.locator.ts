@@ -7,7 +7,7 @@ export const BuatPesananLocators = (page: any) => ({
     FieldPenanggungJawab: page.getByPlaceholder('Nama Penanggung Jawab'),
     FieldDiskonKeseluruhan: page.getByLabel('Diskon Keseluruhan'),
     DiskonkeseluruhanPersen: page.getByLabel('Persentase'),
-    JumlahPersenDiskon: page.locator('.form-group').filter({ hasText: 'Nilai Diskon' }).locator('input'),
+    JumlahPersenDiskon: page.getByText('Nilai Diskon').locator('xpath=following::input[1]'),
     DiskonkeseluruhanRupiah: page.getByLabel('Nilai Rupiah'),
     FieldDiskonPerItem: page.getByLabel('Diskon Per-Item'),
     FieldTanpaDiskon: page.getByLabel('Tanpa Diskon'),
