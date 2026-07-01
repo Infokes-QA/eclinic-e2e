@@ -1,9 +1,6 @@
 export const ROUTES = {
   login: "/login",
-
-  //contoh route lainnya
-
-  //dashboard: "/dashboard",
+  home: "/home",
 } as const;
 
 export type Route = keyof typeof ROUTES;

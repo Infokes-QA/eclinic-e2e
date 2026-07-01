@@ -37,6 +37,18 @@ export class LoginPage extends BasePage {
     await this.sweetAlert.closeIfVisible();
   }
 
+  async verifyOnHomePage(): Promise<void> {
+    await this.expectUrlMatches(UrlHelper.getHomeUrlPattern(), ENV.TIMEOUT);
+    await this.sweetAlert.closeIfVisible();
+  }
+
+  async openHomePage(origin?: string): Promise<void> {
+    const homeUrl = origin
+      ? UrlHelper.buildAuthenticatedHomeUrl(origin)
+      : UrlHelper.getAuthenticatedHomeUrl();
+    await this.goTo(homeUrl);
+  }
+
   async selectClinic(clinicName: string): Promise<void> {
     await this.clinicInput.click();
     await this.clinicInput.clear();

@@ -11,6 +11,8 @@ export class CustomWorld extends World {
 
   loginPage!: LoginPage;
   landingPage!: LandingPage;
+
+  authRole?: string;
 }
 
 setWorldConstructor(CustomWorld);

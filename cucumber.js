@@ -8,7 +8,7 @@ module.exports = {
     paths: ["features/**/*.feature"],
     format: [
       "progress",
-      "html:reports/cucumber/cucumber-report.html"
+      "json:reports/cucumber/cucumber-report.json",
     ],
     timeout: 30000,
     publishQuiet: true

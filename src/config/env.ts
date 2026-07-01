@@ -37,4 +37,12 @@ export const ENV = {
   BROWSER: process.env.BROWSER || "chromium",
 
   TIMEOUT: Number(process.env.TIMEOUT) || 30000,
+
+  AUTH_STATE_MAX_AGE_HOURS: Number(process.env.AUTH_STATE_MAX_AGE_HOURS) || 24,
+
+  AUTH_DEFAULT_MENU: process.env.AUTH_DEFAULT_MENU || "patientManagement",
+
+  AUTH_DEFAULT_SUBMENU: process.env.AUTH_DEFAULT_SUBMENU || "pratama",
+
+  AUTH_HOME_QUERY: process.env.AUTH_HOME_QUERY || "broadcastNotif=1",
 };

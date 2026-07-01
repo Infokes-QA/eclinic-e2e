@@ -33,9 +33,12 @@ export class BrowserHelper {
     return await browser.launch(launchOptions);
   }
 
-  static async createContext(browser: Browser): Promise<BrowserContext> {
+  static async createContext(
+    browser: Browser,
+    storageStatePath?: string,
+  ): Promise<BrowserContext> {
     return await browser.newContext({
-      storageState: undefined,
+      storageState: storageStatePath,
       viewport: {
         width: 1920,
         height: 1080,

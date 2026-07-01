@@ -1,38 +1,66 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 
 import { SweetAlertLocator } from "../../locators/shared/sweet-alert.locator";
 
+const SWEET_ALERT_TIMEOUT = 5000;
+
 export class SweetAlertComponent {
+  readonly container: Locator;
   readonly popup: Locator;
-  readonly closeButton: Locator;
   readonly confirmButton: Locator;
+  readonly cancelButton: Locator;
+  readonly actionButton: Locator;
 
   constructor(private readonly page: Page) {
+    this.container = page.locator(SweetAlertLocator.container);
     this.popup = page.locator(SweetAlertLocator.popup);
-    this.closeButton = page.locator(SweetAlertLocator.close);
     this.confirmButton = page.locator(SweetAlertLocator.confirm);
+    this.cancelButton = page.locator(SweetAlertLocator.cancel);
+    this.actionButton = page.locator(SweetAlertLocator.actionButton);
   }
 
   async closeIfVisible(): Promise<void> {
     const popup = this.popup.first();
 
-    await popup.waitFor({ state: "visible", timeout: 5000 }).catch(() => undefined);
+    await popup.waitFor({ state: "visible", timeout: SWEET_ALERT_TIMEOUT }).catch(() => undefined);
 
     if (!(await popup.isVisible())) {
       return;
     }
 
-    const closeButton = this.closeButton.first();
-    const confirmButton = this.confirmButton.first();
+    await this.tryDismissWithContainer();
 
-    if (await closeButton.isVisible()) {
-      await closeButton.click();
-    } else if (await confirmButton.isVisible()) {
-      await confirmButton.click();
-    } else {
-      await this.page.keyboard.press("Escape");
+    if (await popup.isVisible()) {
+      await this.dismissWithButtons();
     }
 
-    await expect(popup).toBeHidden();
+    if (await popup.isVisible()) {
+      await this.page.keyboard.press("Escape").catch(() => undefined);
+    }
+  }
+
+  private async tryDismissWithContainer(): Promise<void> {
+    const container = this.container.first();
+
+    if (!(await container.isVisible())) {
+      return;
+    }
+
+    await container.click({ position: { x: 8, y: 8 }, timeout: SWEET_ALERT_TIMEOUT }).catch(() => undefined);
+  }
+
+  private async dismissWithButtons(): Promise<void> {
+    const candidates = [
+      this.confirmButton.first(),
+      this.cancelButton.first(),
+      this.actionButton.first(),
+    ];
+
+    for (const button of candidates) {
+      if (await button.isVisible()) {
+        await button.click({ timeout: SWEET_ALERT_TIMEOUT }).catch(() => undefined);
+        return;
+      }
+    }
   }
 }

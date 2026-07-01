@@ -1,5 +1,7 @@
 export const SweetAlertLocator = {
+  container: ".swal2-container",
   popup: ".swal2-popup",
-  close: ".swal2-close",
   confirm: ".swal2-confirm",
+  cancel: ".swal2-cancel",
+  actionButton: ".swal2-actions button:visible",
 } as const;
