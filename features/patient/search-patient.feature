@@ -1,18 +1,18 @@
 @authenticated @patient @search-patient
-Feature: Search dan Filter Pasien
+Feature: Pencarian dan Filter Pasien
 
   Background:
     Given user sudah login sebagai "admin"
 
   @smoke @patient @positive
-  Scenario: User dapat membuka halaman Pasien melalui menu Pasien
-    When user membuka halaman Pasien melalui menu "pendaftaran" dan submenu "pasien"
+  Scenario: User dapat membuka halaman pasien
+    When user membuka halaman pasien
     Then user berada di halaman "Pasien"
     And form filter Pasien ditampilkan
 
   @regression @patient @positive
   Scenario Outline: User dapat mencari pasien dengan kata kunci
-    When user membuka halaman Pasien melalui menu "pendaftaran" dan submenu "pasien"
+    When user membuka halaman pasien
     And user mencari pasien dengan kata kunci "<keyword>"
     Then tabel Pasien menampilkan hasil yang mengandung "<expected>"
 
@@ -24,7 +24,7 @@ Feature: Search dan Filter Pasien
 
   @regression @patient @positive
   Scenario Outline: User dapat memfilter data pasien
-    When user membuka halaman Pasien melalui menu "pendaftaran" dan submenu "pasien"
+    When user membuka halaman pasien
     And user memfilter data pasien dengan tipe record "<tipeRecord>" verifikasi "<verifikasi>" dan general consent "<generalConsent>"
     And user menekan tombol Cari pada halaman Pasien
     Then tabel Pasien menampilkan data hasil filter
@@ -37,7 +37,7 @@ Feature: Search dan Filter Pasien
 
   @regression @patient @positive
   Scenario Outline: User dapat mengatur jumlah data per halaman
-    When user membuka halaman Pasien melalui menu "pendaftaran" dan submenu "pasien"
+    When user membuka halaman pasien
     And user menampilkan "<limit>" data per halaman pada tabel Pasien
     Then tabel Pasien menampilkan maksimal "<limit>" baris data
 

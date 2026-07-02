@@ -32,14 +32,29 @@ if (!fs.existsSync(reportDir)) {
 
 console.log(`Running command: ${command}`);
 
-execSync(command, {
-  stdio: "inherit",
-  env: process.env,
-});
+function runCommand(commandToRun: string): number {
+  try {
+    execSync(commandToRun, {
+      stdio: "inherit",
+      env: process.env,
+    });
+
+    return 0;
+  } catch (error) {
+    const status = (error as { status?: number }).status;
+
+    return status ?? 1;
+  }
+}
+
+const testExitCode = runCommand(command);
 
 if (!skipReport) {
-  execSync("ts-node src/scripts/generate-report.ts", {
-    stdio: "inherit",
-    env: process.env,
-  });
+  const reportExitCode = runCommand("ts-node src/scripts/generate-report.ts");
+
+  if (testExitCode === 0 && reportExitCode !== 0) {
+    process.exit(reportExitCode);
+  }
 }
+
+process.exit(testExitCode);

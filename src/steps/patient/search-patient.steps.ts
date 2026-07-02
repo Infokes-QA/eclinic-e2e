@@ -1,5 +1,6 @@
 import { Then, When } from "@cucumber/cucumber";
 
+import { PatientFixture } from "../../fixtures/patient.fixture";
 import { SearchPatientPage } from "../../pages/patient/SearchPatientPage";
 import { CustomWorld } from "../../support/world";
 
@@ -19,6 +20,13 @@ When(
     await searchPatientPage.openFromNavbar(menu, submenu);
   },
 );
+
+When("user membuka halaman pasien", async function (this: CustomWorld) {
+  const searchPatientPage = ensureSearchPatientPage(this);
+  const { menu, submenu } = PatientFixture.searchPatientNavigation;
+
+  await searchPatientPage.openFromNavbar(menu, submenu);
+});
 
 When("user mencari pasien dengan kata kunci {string}", async function (this: CustomWorld, keyword: string) {
   const searchPatientPage = ensureSearchPatientPage(this);

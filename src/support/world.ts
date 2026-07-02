@@ -24,6 +24,14 @@ export class CustomWorld extends World {
   authRole?: string;
   patientFormInput?: PatientFormInput;
   createdPatientSnapshot?: CreatedPatientSnapshot;
+
+  terminalScenarioStartedAt?: number;
+  terminalStepStartedAt?: number;
+  terminalStepIndex?: number;
+  terminalStepTotal?: number;
+  terminalFailedStep?: string;
+  terminalFailureMessage?: string;
+  terminalReporter?: "compact" | "smoke" | "verbose";
 }
 
 setWorldConstructor(CustomWorld);
