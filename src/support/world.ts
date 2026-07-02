@@ -1,0 +1,29 @@
+import { setWorldConstructor, World } from "@cucumber/cucumber";
+import { Browser, BrowserContext, Page } from "playwright";
+
+import { LoginPage } from "../pages/authentication/LoginPage";
+import { LandingPage } from "../pages/landing/LandingPage";
+import { CreatePatientPage } from "../pages/patient/CreatePatientPage";
+import { RegisterPatientPage } from "../pages/patient/RegisterPatientPage";
+import { PatientShowDetailPage } from "../pages/patient/PatientShowDetailPage";
+import { SearchPatientPage } from "../pages/patient/SearchPatientPage";
+import { CreatedPatientSnapshot, PatientFormInput } from "../types/patient.type";
+
+export class CustomWorld extends World {
+  browser!: Browser;
+  context!: BrowserContext;
+  page!: Page;
+
+  loginPage!: LoginPage;
+  landingPage!: LandingPage;
+  createPatientPage!: CreatePatientPage;
+  registerPatientPage!: RegisterPatientPage;
+  searchPatientPage!: SearchPatientPage;
+  patientShowDetailPage!: PatientShowDetailPage;
+
+  authRole?: string;
+  patientFormInput?: PatientFormInput;
+  createdPatientSnapshot?: CreatedPatientSnapshot;
+}
+
+setWorldConstructor(CustomWorld);

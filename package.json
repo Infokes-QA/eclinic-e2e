@@ -1,0 +1,51 @@
+{
+  "name": "eclinic-e2e",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "e2e": "ts-node src/runner/runner.ts",
+    "test": "ts-node src/runner/runner.ts",
+    "test:headed": "ts-node src/runner/runner.ts --headed",
+    "test:headless": "ts-node src/runner/runner.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "auth:setup": "ts-node src/scripts/auth.setup.ts",
+    "check": "npm run lint && npm run type-check",
+    "report:generate": "ts-node src/scripts/generate-report.ts",
+    "report:open": "start reports/cucumber/html/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Infokes-QA/eclinic-e2e.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Infokes-QA/eclinic-e2e/issues"
+  },
+  "homepage": "https://github.com/Infokes-QA/eclinic-e2e#readme",
+  "devDependencies": {
+    "@cucumber/cucumber": "^13.0.0",
+    "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.61.1",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^26.0.1",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.4.2",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "minimist": "^1.2.8",
+    "multiple-cucumber-html-reporter": "^3.9.3",
+    "playwright": "^1.61.1",
+    "prettier": "^3.8.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.49.0"
+  }
+}
