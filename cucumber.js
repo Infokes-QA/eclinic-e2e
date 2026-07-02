@@ -7,7 +7,7 @@ module.exports = {
     ],
     paths: ["features/**/*.feature"],
     format: [
-      "progress",
+      "./src/support/formatters/silent.formatter.js",
       "json:reports/cucumber/cucumber-report.json",
     ],
     timeout: 30000,

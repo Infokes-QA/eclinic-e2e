@@ -20,13 +20,29 @@ Given(
   },
 );
 
+Given("pasien baru sudah dibuat", { timeout: 120_000 }, async function (this: CustomWorld) {
+  await runCreatePatientLengkapFlow(this);
+});
+
 When("user mengisi form Data Pelayanan dengan kunjungan sakit", async function (this: CustomWorld) {
   const registerPatientPage = ensureRegisterPatientPage(this);
 
   await registerPatientPage.fillPelayananFormKunjunganSakit();
 });
 
+When("user memilih pelayanan kunjungan sakit", async function (this: CustomWorld) {
+  const registerPatientPage = ensureRegisterPatientPage(this);
+
+  await registerPatientPage.fillPelayananFormKunjunganSakit();
+});
+
 When("user menekan tombol Lanjutkan pendaftaran", async function (this: CustomWorld) {
+  const registerPatientPage = ensureRegisterPatientPage(this);
+
+  await registerPatientPage.clickLanjutkanPendaftaran();
+});
+
+When("user melanjutkan pendaftaran pasien", async function (this: CustomWorld) {
   const registerPatientPage = ensureRegisterPatientPage(this);
 
   await registerPatientPage.clickLanjutkanPendaftaran();

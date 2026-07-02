@@ -6,7 +6,7 @@ Feature: Registrasi Pasien
 
   @regression @patient @positive
   Scenario: User dapat mendaftarkan pasien dengan kunjungan sakit
-    Given pasien baru sudah dibuat di halaman pendaftaran create
-    When user mengisi form Data Pelayanan dengan kunjungan sakit
-    And user menekan tombol Lanjutkan pendaftaran
+    Given pasien baru sudah dibuat
+    When user memilih pelayanan kunjungan sakit
+    And user melanjutkan pendaftaran pasien
     Then pendaftaran pasien berhasil

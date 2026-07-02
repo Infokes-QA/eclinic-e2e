@@ -181,4 +181,30 @@ export class AuthHelper {
       await browser.close();
     }
   }
+
+  static async ensureValidAuthState(role: string): Promise<string> {
+    const statePath = await this.ensureAuthState(role);
+    const browser = await BrowserHelper.launchBrowser();
+    const context = await BrowserHelper.createContext(browser, statePath);
+    const page = await context.newPage();
+    page.setDefaultTimeout(ENV.TIMEOUT);
+
+    try {
+      await this.openAuthenticatedHome(page, this.getAuthEntryUrl(role));
+
+      return statePath;
+    } catch {
+      await page.close().catch(() => undefined);
+      await context.close().catch(() => undefined);
+      await browser.close().catch(() => undefined);
+
+      this.deleteAuthState(role);
+
+      return await this.ensureAuthState(role);
+    } finally {
+      await page.close().catch(() => undefined);
+      await context.close().catch(() => undefined);
+      await browser.close().catch(() => undefined);
+    }
+  }
 }

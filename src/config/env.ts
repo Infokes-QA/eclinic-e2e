@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-dotenv.config({ override: true });
+dotenv.config();
 
 export type Environment = "DEV1" | "DEV2" | "DEV3" | "DEV4" | "UAT";
 
@@ -33,6 +33,10 @@ export const ENV = {
   PASSWORD: process.env[`${ACTIVE_ENVIRONMENT}_PASSWORD`] || "",
 
   HEADLESS: process.env.HEADLESS === "true",
+
+  TERMINAL_PROGRESS: process.env.TERMINAL_PROGRESS !== "false",
+
+  TERMINAL_REPORTER: process.env.TERMINAL_REPORTER || "auto",
 
   BROWSER: process.env.BROWSER || "chromium",
 

@@ -1,5 +1,6 @@
 import { Then, When } from "@cucumber/cucumber";
 
+import { PatientFixture } from "../../fixtures/patient.fixture";
 import { CreatePatientPage } from "../../pages/patient/CreatePatientPage";
 import { CustomWorld } from "../../support/world";
 
@@ -20,7 +21,20 @@ When(
   },
 );
 
+When("user membuka halaman pembuatan pasien", async function (this: CustomWorld) {
+  const createPatientPage = ensureCreatePatientPage(this);
+  const { menu, submenu } = PatientFixture.createPatientNavigation;
+
+  await createPatientPage.openFromNavbar(menu, submenu);
+});
+
 When("user membuka modal Buat Pasien Baru", async function (this: CustomWorld) {
+  const createPatientPage = ensureCreatePatientPage(this);
+
+  await createPatientPage.openCreatePatientModal();
+});
+
+When("user memilih membuat pasien baru", async function (this: CustomWorld) {
   const createPatientPage = ensureCreatePatientPage(this);
 
   await createPatientPage.openCreatePatientModal();
@@ -41,7 +55,25 @@ When(
   },
 );
 
+When("user memilih mode data pasien ringkas", async function (this: CustomWorld) {
+  const createPatientPage = ensureCreatePatientPage(this);
+
+  await createPatientPage.setVerifiedCheckboxState("tidak dicentang");
+});
+
+When("user memilih mode data pasien lengkap", async function (this: CustomWorld) {
+  const createPatientPage = ensureCreatePatientPage(this);
+
+  await createPatientPage.setVerifiedCheckboxState("dicentang");
+});
+
 When("user mengisi form Create Pasien dengan data ringkas", async function (this: CustomWorld) {
+  const createPatientPage = ensureCreatePatientPage(this);
+
+  this.patientFormInput = await createPatientPage.fillPatientFormWithFakeDataRingkas();
+});
+
+When("user mengisi data pasien ringkas", async function (this: CustomWorld) {
   const createPatientPage = ensureCreatePatientPage(this);
 
   this.patientFormInput = await createPatientPage.fillPatientFormWithFakeDataRingkas();
@@ -49,6 +81,16 @@ When("user mengisi form Create Pasien dengan data ringkas", async function (this
 
 When(
   "user mengisi form Create Pasien dengan data lengkap",
+  { timeout: 120_000 },
+  async function (this: CustomWorld) {
+    const createPatientPage = ensureCreatePatientPage(this);
+
+    this.patientFormInput = await createPatientPage.fillPatientFormWithFakeDataLengkap();
+  },
+);
+
+When(
+  "user mengisi data pasien lengkap",
   { timeout: 120_000 },
   async function (this: CustomWorld) {
     const createPatientPage = ensureCreatePatientPage(this);
@@ -67,7 +109,23 @@ When(
   },
 );
 
+When("user menyimpan data pasien", { timeout: 120_000 }, async function (this: CustomWorld) {
+  const createPatientPage = ensureCreatePatientPage(this);
+
+  await createPatientPage.clickSavePatientButton();
+});
+
 Then("form Create Pasien terisi dengan data pasien", async function (this: CustomWorld) {
+  if (!this.patientFormInput) {
+    throw new Error("Data pasien belum tersedia. Jalankan step pengisian form terlebih dahulu.");
+  }
+
+  const createPatientPage = ensureCreatePatientPage(this);
+
+  await createPatientPage.verifyPatientFormFilled(this.patientFormInput);
+});
+
+Then("data pasien ringkas terisi dengan benar", async function (this: CustomWorld) {
   if (!this.patientFormInput) {
     throw new Error("Data pasien belum tersedia. Jalankan step pengisian form terlebih dahulu.");
   }
@@ -99,11 +157,35 @@ Then(
   },
 );
 
+Then("data pasien berhasil tersimpan", { timeout: 120_000 }, async function (this: CustomWorld) {
+  const createPatientPage = ensureCreatePatientPage(this);
+
+  await createPatientPage.verifySaveAlertSuccess();
+});
+
 Then("user berada di halaman pendaftaran create", async function (this: CustomWorld) {
   const createPatientPage = ensureCreatePatientPage(this);
 
   await createPatientPage.verifyOnCreateRegistrationPage();
 });
+
+Then(
+  "halaman pendaftaran menampilkan data pasien yang dibuat",
+  { timeout: 120_000 },
+  async function (this: CustomWorld) {
+    if (!this.patientFormInput) {
+      throw new Error("Data pasien belum tersedia. Jalankan step pengisian form terlebih dahulu.");
+    }
+
+    const createPatientPage = ensureCreatePatientPage(this);
+
+    await createPatientPage.verifyOnCreateRegistrationPage();
+    await createPatientPage.verifyPatientPanelKiri(this.patientFormInput);
+    this.createdPatientSnapshot = await createPatientPage.captureCreatedPatientSnapshot(
+      this.patientFormInput,
+    );
+  },
+);
 
 Then(
   "panel Data Pasien menampilkan data pasien yang dibuat",

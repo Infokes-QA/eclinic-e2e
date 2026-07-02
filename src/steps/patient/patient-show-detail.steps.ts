@@ -32,7 +32,31 @@ When("user membuka detail pasien yang baru dibuat dari tabel Pasien", async func
   await searchPatientPage.openCreatedPatientDetailByDoubleClick(this.createdPatientSnapshot);
 });
 
+When("user membuka detail pasien yang baru dibuat", async function (this: CustomWorld) {
+  if (!this.createdPatientSnapshot) {
+    throw new Error(
+      "Data pasien yang dibuat belum tersedia. Jalankan step create pasien terlebih dahulu.",
+    );
+  }
+
+  const searchPatientPage = ensureSearchPatientPage(this);
+
+  await searchPatientPage.openCreatedPatientDetailByDoubleClick(this.createdPatientSnapshot);
+});
+
 Then("halaman detail Pasien menampilkan data pasien yang baru dibuat", async function (this: CustomWorld) {
+  if (!this.createdPatientSnapshot) {
+    throw new Error(
+      "Data pasien yang dibuat belum tersedia. Jalankan step create pasien terlebih dahulu.",
+    );
+  }
+
+  const patientShowDetailPage = ensurePatientShowDetailPage(this);
+
+  await patientShowDetailPage.verifyPatientDetail(this.createdPatientSnapshot);
+});
+
+Then("detail pasien menampilkan data pasien yang baru dibuat", async function (this: CustomWorld) {
   if (!this.createdPatientSnapshot) {
     throw new Error(
       "Data pasien yang dibuat belum tersedia. Jalankan step create pasien terlebih dahulu.",
