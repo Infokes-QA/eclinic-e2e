@@ -1,4 +1,5 @@
-import { After, Before, Status, setDefaultTimeout } from "@cucumber/cucumber";
+import { After, AfterStep, Before, Status, setDefaultTimeout } from "@cucumber/cucumber";
+import { PickleStepType } from "@cucumber/messages";
 import fs from "fs";
 import { ENV } from "../config/env";
 import { AuthHelper } from "../helpers/auth.helper";
@@ -35,6 +36,33 @@ Before(async function (this: CustomWorld, scenario) {
 
   this.page = await this.context.newPage();
   this.page.setDefaultTimeout(ENV.TIMEOUT);
+});
+
+AfterStep(async function (this: CustomWorld, { pickle, pickleStep, result }) {
+  if (pickleStep.type !== PickleStepType.OUTCOME) {
+    return;
+  }
+
+  const statusSuffix = result?.status === Status.FAILED ? "failed" : "passed";
+
+  try {
+    if (!this.page || this.page.isClosed()) {
+      return;
+    }
+
+    await ScreenshotHelper.attachThenStepScreenshot(
+      {
+        page: this.page,
+        attach: (data, options) => this.attach(data, options),
+      },
+      pickle.name,
+      pickleStep.text,
+      statusSuffix,
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await this.attach(`Screenshot Then step gagal diambil: ${message}`, "text/plain");
+  }
 });
 
 After(async function (this: CustomWorld, scenario) {

@@ -36,7 +36,9 @@ export const ENV = {
 
   BROWSER: process.env.BROWSER || "chromium",
 
-  TIMEOUT: Number(process.env.TIMEOUT) || 30000,
+  TIMEOUT: Number(process.env.TIMEOUT) || 15000,
+
+  OPTIONAL_DIALOG_TIMEOUT: Number(process.env.OPTIONAL_DIALOG_TIMEOUT) || 2000,
 
   AUTH_STATE_MAX_AGE_HOURS: Number(process.env.AUTH_STATE_MAX_AGE_HOURS) || 24,
 

@@ -71,6 +71,7 @@ Catatan: salin `.env.example` ke `.env`, lalu isi nilai sesuai environment yang 
 | `npm run format`        | Format seluruh file dengan Prettier.               |
 | `npm run format:check`  | Cek format tanpa mengubah file.                    |
 | `npm run check`         | Menjalankan lint dan type-check.                   |
+| `npm run auth:setup`    | Menyiapkan auth state untuk scenario `@authenticated`. |
 | `npm run report:open`   | Membuka laporan Cucumber HTML di browser.          |
 
 ## Cara Menjalankan Test
@@ -111,11 +112,61 @@ Automation login dimulai dari Landing Page.
 Feature yang tersedia:
 
 - `features/authentication/login.feature`
+- `features/authentication/authenticated-session.feature`
+- `features/patient/create-patient.feature`
+- `features/patient/register-patient.feature`
+- `features/patient/search-patient.feature`
+- `features/patient/patient-journey.feature`
 
-Scenario saat ini:
+Scenario login saat ini:
 
 - Login berhasil menggunakan akun Admin (`@smoke @login @positive`)
 - Login gagal menggunakan data invalid (`@login @negative`)
+
+Scenario authenticated session:
+
+- User dapat mengakses aplikasi dengan session tersimpan (`@authenticated @smoke`)
+
+## Alur Patient Saat Ini
+
+### Create Pasien
+
+1. Login dengan session `@authenticated`.
+2. Buka menu `pendaftaran` → submenu `createPasien`.
+3. Isi form Create Pasien (ringkas/lengkap).
+4. Simpan pasien, verifikasi toast `Data berhasil disimpan`, redirect, dan panel kiri.
+
+### Register Pasien
+
+1. Buat pasien baru di halaman pendaftaran create.
+2. Isi form Data Pelayanan kunjungan sakit.
+3. Klik Lanjutkan dan verifikasi pendaftaran berhasil.
+
+### Search dan Filter Pasien
+
+1. Buka menu `pendaftaran` → submenu `pasien`.
+2. Verifikasi halaman `/pasien`.
+3. Search by kata kunci atau filter tipe record, verifikasi, general consent.
+4. Assert tabel pasien menampilkan hasil per kolom (No. eRM, Nama, NIK).
+
+### Patient Journey Happy Flow
+
+1. Buat pasien lengkap via flow reusable `create-patient-lengkap.flow.ts`.
+2. Search pasien yang baru dibuat berdasarkan `nama` dan `nik`.
+3. Assert baris hasil pencarian cocok dengan data snapshot.
+4. Double-click baris hasil untuk membuka halaman detail `/pasien/show/{noRm}`.
+5. Assert halaman `Lihat Data Pasien` menampilkan No. eRM, Nama, dan NIK.
+
+Contoh menjalankan module patient:
+
+```bash
+npm run e2e -- --module=patient
+npm run e2e -- --feature=patient/search-patient.feature
+npm run e2e -- --feature=patient/patient-journey.feature
+npm run e2e -- --tags="@search-patient"
+npm run e2e -- --tags="@journey"
+npm run e2e -- --tags="@full-case"
+```
 
 ## Route dan URL
 
@@ -134,8 +185,14 @@ UrlHelper.get("login");
 ```text
 eclinic-e2e/
 |-- features/
-|   `-- authentication/
-|       `-- login.feature
+|   |-- authentication/
+|   |   |-- login.feature
+|   |   `-- authenticated-session.feature
+|   `-- patient/
+|       |-- create-patient.feature
+|       |-- register-patient.feature
+|       |-- search-patient.feature
+|       `-- patient-journey.feature
 |-- src/
 |   |-- config/
 |   |   |-- env.ts
@@ -144,13 +201,21 @@ eclinic-e2e/
 |   |-- data/
 |   |   |-- authentication/
 |   |   |   `-- login.data.ts
-|   |   `-- landing/
-|   |       `-- landing.data.ts
+|   |   |-- landing/
+|   |   |   `-- landing.data.ts
+|   |   `-- patient/
+|   |       |-- create-patient.data.ts
+|   |       |-- register-patient.data.ts
+|   |       |-- search-patient.data.ts
+|   |       `-- patient-show-detail.data.ts
 |   |-- fixtures/
+|   |   |-- patient.fixture.ts
 |   |   `-- users.fixture.ts
 |   |-- helpers/
+|   |   |-- auth.helper.ts
 |   |   |-- browser.helper.ts
 |   |   |-- logger.helper.ts
+|   |   |-- patient-display.helper.ts
 |   |   |-- random.helper.ts
 |   |   `-- screenshot.helper.ts
 |   |-- locators/
@@ -158,7 +223,14 @@ eclinic-e2e/
 |   |   |   `-- login.locator.ts
 |   |   |-- landing/
 |   |   |   `-- landing.locator.ts
+|   |   |-- patient/
+|   |   |   |-- create-patient.locator.ts
+|   |   |   |-- register-patient.locator.ts
+|   |   |   |-- search-patient.locator.ts
+|   |   |   `-- patient-show-detail.locator.ts
 |   |   `-- shared/
+|   |       |-- navbar.locator.ts
+|   |       |-- notify.locator.ts
 |   |       `-- sweet-alert.locator.ts
 |   |-- pages/
 |   |   |-- authentication/
@@ -166,19 +238,41 @@ eclinic-e2e/
 |   |   |-- base/
 |   |   |   `-- BasePage.ts
 |   |   |-- components/
+|   |   |   |-- NavbarComponent.ts
+|   |   |   |-- NotifyComponent.ts
 |   |   |   `-- SweetAlertComponent.ts
-|   |   `-- landing/
-|   |       `-- LandingPage.ts
+|   |   |-- landing/
+|   |   |   `-- LandingPage.ts
+|   |   `-- patient/
+|   |       |-- CreatePatientPage.ts
+|   |       |-- RegisterPatientPage.ts
+|   |       |-- SearchPatientPage.ts
+|   |       `-- PatientShowDetailPage.ts
 |   |-- runner/
 |   |   `-- runner.ts
+|   |-- scripts/
+|   |   |-- auth.setup.ts
+|   |   `-- generate-report.ts
 |   |-- steps/
 |   |   |-- authentication/
+|   |   |   |-- auth.steps.ts
 |   |   |   `-- login.steps.ts
+|   |   |-- patient/
+|   |   |   |-- create-patient.steps.ts
+|   |   |   |-- register-patient.steps.ts
+|   |   |   |-- search-patient.steps.ts
+|   |   |   `-- patient-show-detail.steps.ts
+|   |   |-- shared/
+|   |   |   `-- page.steps.ts
 |   |   `-- landing.steps.ts
 |   |-- support/
+|   |   |-- flows/
+|   |   |   `-- create-patient-lengkap.flow.ts
 |   |   |-- hooks.ts
 |   |   `-- world.ts
 |   `-- types/
+|       |-- patient-search.type.ts
+|       |-- patient.type.ts
 |       `-- user.type.ts
 |-- .env.example
 |-- CONTRIBUTING.md
@@ -202,23 +296,35 @@ eclinic-e2e/
 - `src/pages/` -> Page Object berisi action, assertion, dan reusable method
 - `src/pages/components/` -> komponen UI reusable yang dipakai oleh Page Object
 - `src/runner/` -> entry point command line
+- `src/scripts/` -> utility script seperti auth setup dan generate report
 - `src/steps/` -> step definition yang hanya memanggil Page methods
-- `src/support/` -> Cucumber world, hooks, browser lifecycle, screenshot, dan trace
+- `src/support/` -> Cucumber world, hooks, browser lifecycle, screenshot, trace, dan flows
+- `src/support/flows/` -> orchestration reusable untuk journey atau setup komposit
 - `src/types/` -> type dan interface TypeScript
 
 ## File Utama
 
 - `features/authentication/login.feature` -> scenario login
+- `features/authentication/authenticated-session.feature` -> scenario session tersimpan
+- `features/patient/create-patient.feature` -> scenario create pasien
+- `features/patient/register-patient.feature` -> scenario registrasi pasien
+- `features/patient/search-patient.feature` -> scenario search dan filter pasien
+- `features/patient/patient-journey.feature` -> happy flow create, search, dan detail pasien
 - `src/pages/authentication/LoginPage.ts` -> Page Object halaman login
 - `src/pages/landing/LandingPage.ts` -> Page Object halaman landing
-- `src/pages/components/SweetAlertComponent.ts` -> handler dialog SweetAlert setelah login sukses
-- `src/locators/authentication/login.locator.ts` -> selector halaman login
-- `src/locators/landing/landing.locator.ts` -> selector halaman landing
-- `src/locators/shared/sweet-alert.locator.ts` -> selector dialog SweetAlert
-- `src/data/authentication/login.data.ts` -> expected value login
-- `src/data/landing/landing.data.ts` -> expected value landing
-- `src/steps/authentication/login.steps.ts` -> step definition login
-- `src/steps/landing.steps.ts` -> step definition landing
+- `src/pages/patient/CreatePatientPage.ts` -> Page Object create pasien
+- `src/pages/patient/RegisterPatientPage.ts` -> Page Object registrasi pasien
+- `src/pages/patient/SearchPatientPage.ts` -> Page Object search/filter pasien
+- `src/pages/patient/PatientShowDetailPage.ts` -> Page Object detail pasien `/pasien/show/{id}`
+- `src/pages/components/NavbarComponent.ts` -> navigasi menu aplikasi
+- `src/pages/components/NotifyComponent.ts` -> handler toast notify
+- `src/pages/components/SweetAlertComponent.ts` -> handler dialog SweetAlert
+- `src/locators/patient/search-patient.locator.ts` -> selector halaman pasien/datatable
+- `src/locators/patient/patient-show-detail.locator.ts` -> selector halaman detail pasien
+- `src/support/flows/create-patient-lengkap.flow.ts` -> flow reusable create pasien lengkap
+- `src/helpers/patient-display.helper.ts` -> formatter No. eRM untuk assert tabel/detail
+- `src/helpers/auth.helper.ts` -> helper auth state dan session
+- `src/fixtures/patient.fixture.ts` -> navigasi dan sample data patient
 - `src/fixtures/users.fixture.ts` -> input credential dari environment
 
 ## Naming Convention
@@ -232,6 +338,7 @@ eclinic-e2e/
 - Helper menggunakan `kebab-case`, contoh `browser.helper.ts`.
 - Type menggunakan `kebab-case`, contoh `user.type.ts`.
 - Step definition menggunakan `kebab-case`, contoh `login.steps.ts`.
+- Flow file menggunakan `kebab-case`, contoh `create-patient-lengkap.flow.ts`.
 - Class, interface, type alias, dan enum menggunakan `PascalCase`.
 - Variable dan function menggunakan `camelCase`.
 - Primitive constants menggunakan `UPPER_SNAKE_CASE`.
@@ -245,6 +352,7 @@ eclinic-e2e/
 - Locator file hanya berisi selector.
 - Data file berisi expected value, bukan selector.
 - Fixture file berisi input test data, bukan assertion value.
+- Flow file berisi orchestration reusable, bukan selector atau assertion mentah.
 - Component file berisi aksi dan assertion untuk komponen UI reusable, bukan halaman penuh.
 
 ## Browser dan Viewport
@@ -262,10 +370,11 @@ Konfigurasi browser ada di `src/helpers/browser.helper.ts`.
 2. Cucumber memuat feature dari folder `features/`.
 3. `Before` hook di `src/support/hooks.ts` membuka browser, context, dan page baru.
 4. Step membuat Page Object yang dibutuhkan.
-5. Step memanggil method di Page Object.
+5. Step memanggil method di Page Object atau flow reusable di `src/support/flows/`.
 6. Page Object memakai locator dan data sesuai kebutuhan.
 7. Assertion dijalankan melalui Page Object.
-8. `After` hook menutup browser dan menyimpan screenshot serta trace hanya saat scenario gagal.
+8. `AfterStep` hook menyimpan screenshot setiap step `Then` ke `screenshots/` dan melampirkannya ke laporan Cucumber.
+9. `After` hook menutup browser, menyimpan screenshot ringkasan scenario, dan menyimpan trace hanya saat scenario gagal.
 
 ## Catatan Pengembangan
 
@@ -276,6 +385,7 @@ Konfigurasi browser ada di `src/helpers/browser.helper.ts`.
 - Simpan input test data di `src/fixtures/`.
 - Simpan action dan assertion halaman di `src/pages/<module>/`.
 - Simpan komponen UI reusable di `src/pages/components/`.
+- Simpan orchestration journey reusable di `src/support/flows/`.
 - Jalankan `npm run check` sebelum commit.
 
 Panduan kontribusi detail ada di [CONTRIBUTING.md](./CONTRIBUTING.md).

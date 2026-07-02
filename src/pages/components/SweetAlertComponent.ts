@@ -1,8 +1,7 @@
 import { Locator, Page } from "@playwright/test";
 
+import { ENV } from "../../config/env";
 import { SweetAlertLocator } from "../../locators/shared/sweet-alert.locator";
-
-const SWEET_ALERT_TIMEOUT = 5000;
 
 export class SweetAlertComponent {
   readonly container: Locator;
@@ -21,8 +20,6 @@ export class SweetAlertComponent {
 
   async closeIfVisible(): Promise<void> {
     const popup = this.popup.first();
-
-    await popup.waitFor({ state: "visible", timeout: SWEET_ALERT_TIMEOUT }).catch(() => undefined);
 
     if (!(await popup.isVisible())) {
       return;
@@ -46,7 +43,9 @@ export class SweetAlertComponent {
       return;
     }
 
-    await container.click({ position: { x: 8, y: 8 }, timeout: SWEET_ALERT_TIMEOUT }).catch(() => undefined);
+    await container
+      .click({ position: { x: 8, y: 8 }, timeout: ENV.OPTIONAL_DIALOG_TIMEOUT })
+      .catch(() => undefined);
   }
 
   private async dismissWithButtons(): Promise<void> {
@@ -58,7 +57,7 @@ export class SweetAlertComponent {
 
     for (const button of candidates) {
       if (await button.isVisible()) {
-        await button.click({ timeout: SWEET_ALERT_TIMEOUT }).catch(() => undefined);
+        await button.click({ timeout: ENV.OPTIONAL_DIALOG_TIMEOUT }).catch(() => undefined);
         return;
       }
     }
