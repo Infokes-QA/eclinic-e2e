@@ -90,3 +90,16 @@ export interface CreatedPatientSnapshot {
   nama: string;
   phoneNumber: string;
 }
+
+export interface RegistrationSnapshot {
+  nama: string;
+  nik: string;
+  noRm: string;
+  kunjungan: string;
+  pelayanan: string;
+  ruangan: string;
+  jadwal: string;
+  dokter?: string;
+  noPendaftaran?: string;
+  noAntrean?: string;
+}

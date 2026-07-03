@@ -6,6 +6,7 @@ import { RegisterPatientData } from "../../data/patient/register-patient.data";
 import { PatientFixture } from "../../fixtures/patient.fixture";
 import { RandomHelper } from "../../helpers/random.helper";
 import { RegisterPatientLocator } from "../../locators/patient/register-patient.locator";
+import { RegistrationSnapshot } from "../../types/patient.type";
 import { BasePage } from "../base/BasePage";
 import { NavbarComponent } from "../components/NavbarComponent";
 import { SweetAlertComponent } from "../components/SweetAlertComponent";
@@ -31,8 +32,15 @@ export class RegisterPatientPage extends BasePage {
   readonly jadwalPraktikFormGroup: Locator;
   readonly jadwalPraktikOptions: Locator;
   readonly btnLanjutkan: Locator;
+  readonly btnSimpanDaftarkanLainnya: Locator;
+  readonly lainnyaModal: Locator;
+  readonly lainnyaModalTutupButton: Locator;
   readonly queuePrintDialog: Locator;
   readonly queuePrintContinueButton: Locator;
+  readonly listPanelTitle: Locator;
+  readonly listSearchInput: Locator;
+  readonly listSearchButton: Locator;
+  readonly listTableRows: Locator;
   readonly navbar: NavbarComponent;
   readonly sweetAlert: SweetAlertComponent;
 
@@ -61,10 +69,19 @@ export class RegisterPatientPage extends BasePage {
     this.jadwalPraktikFormGroup = page.locator(RegisterPatientLocator.pelayanan.jadwalPraktikFormGroup);
     this.jadwalPraktikOptions = page.locator(RegisterPatientLocator.pelayanan.jadwalPraktikOption);
     this.btnLanjutkan = page.locator(RegisterPatientLocator.pelayanan.btnLanjutkan);
+    this.btnSimpanDaftarkanLainnya = page.locator(
+      RegisterPatientLocator.pelayanan.btnSimpanDaftarkanLainnya,
+    );
+    this.lainnyaModal = page.locator(RegisterPatientLocator.lainnyaModal.dialog);
+    this.lainnyaModalTutupButton = page.locator(RegisterPatientLocator.lainnyaModal.tutupButton);
     this.queuePrintDialog = page.locator(RegisterPatientLocator.queuePrintModal.dialog);
     this.queuePrintContinueButton = page.locator(
       RegisterPatientLocator.queuePrintModal.continueButton,
     );
+    this.listPanelTitle = page.locator(RegisterPatientLocator.page.listPanelTitle);
+    this.listSearchInput = page.locator(RegisterPatientLocator.list.searchInput);
+    this.listSearchButton = page.locator(RegisterPatientLocator.list.searchButton);
+    this.listTableRows = page.locator(RegisterPatientLocator.list.tableBodyRow);
     this.navbar = new NavbarComponent(page);
     this.sweetAlert = new SweetAlertComponent(page);
   }
@@ -85,8 +102,88 @@ export class RegisterPatientPage extends BasePage {
 
   async verifyOnPendaftaranListPage(): Promise<void> {
     await this.expectUrlMatches(RegisterPatientData.url.pendaftaranListPage);
-    await this.expectVisible(this.panelTitle);
+    await this.expectVisible(this.listPanelTitle);
     await this.expectVisible(this.tambahButton);
+  }
+
+  async openPendaftaranList(): Promise<void> {
+    await this.navbar.openPendaftaranPasienV2();
+    await this.verifyOnPendaftaranListPage();
+  }
+
+  async searchPatientOnPendaftaranList(keyword: string): Promise<void> {
+    await this.expectVisible(this.listSearchInput);
+    await this.listSearchInput.fill(keyword);
+    await this.click(this.listSearchButton);
+
+    const matchingRow = this.listTableRows.filter({
+      hasText: new RegExp(escapeRegExp(keyword), "i"),
+    });
+
+    await expect(matchingRow.first()).toBeVisible({ timeout: ENV.TIMEOUT });
+  }
+
+  private async findPatientRowOnList(snapshot: RegistrationSnapshot): Promise<Locator> {
+    const namePattern = new RegExp(escapeRegExp(snapshot.nama), "i");
+    const matchingRow = this.listTableRows
+      .filter({ hasText: namePattern })
+      .filter({ hasText: snapshot.nik });
+
+    await expect(matchingRow.first()).toBeVisible({ timeout: ENV.TIMEOUT });
+
+    return matchingRow.first();
+  }
+
+  private async assertRowBelumDiperiksa(row: Locator): Promise<void> {
+    const rowClass = (await row.getAttribute("class")) ?? "";
+    const { sedangDiperiksa, sudahDiperiksa } = RegisterPatientData.list.rowClass;
+
+    if (rowClass.includes(sedangDiperiksa) || rowClass.includes(sudahDiperiksa)) {
+      throw new Error(
+        `Status pendaftaran bukan '${RegisterPatientData.status.belumDiperiksa}'. Class baris: ${rowClass}`,
+      );
+    }
+  }
+
+  async verifyRegistrationOnPendaftaranList(snapshot: RegistrationSnapshot): Promise<string> {
+    await this.openPendaftaranList();
+    await this.searchPatientOnPendaftaranList(snapshot.nama);
+
+    const row = await this.findPatientRowOnList(snapshot);
+    await this.assertRowBelumDiperiksa(row);
+
+    const { columnIndex } = RegisterPatientData.list;
+    const cells = row.locator("td");
+
+    const noPendaftaran = ((await cells.nth(columnIndex.noPendaftaran).innerText()) ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const dataPasien = ((await cells.nth(columnIndex.dataPasien).innerText()) ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const ruanganDaftar = ((await cells.nth(columnIndex.ruanganDaftar).innerText()) ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const statusPelayanan = ((await cells.nth(columnIndex.statusPelayanan).innerText()) ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    expect(dataPasien.toUpperCase()).toContain(snapshot.nama.toUpperCase());
+    expect(dataPasien).toContain(snapshot.nik);
+    expect(ruanganDaftar.toUpperCase()).toContain(snapshot.ruangan.toUpperCase());
+    expect(ruanganDaftar.toUpperCase()).toContain(snapshot.kunjungan);
+
+    if (snapshot.dokter) {
+      expect(ruanganDaftar.toUpperCase()).toContain(snapshot.dokter.toUpperCase());
+    }
+
+    expect(statusPelayanan).toBe(RegisterPatientData.status.pelayananPendaftaran);
+
+    if (!noPendaftaran) {
+      throw new Error("Nomor pendaftaran tidak ditemukan pada daftar pendaftaran pasien.");
+    }
+
+    return noPendaftaran;
   }
 
   async clickTambahOnPendaftaranPage(): Promise<void> {
@@ -162,18 +259,65 @@ export class RegisterPatientPage extends BasePage {
     await this.expectVisible(this.pelayananHeading);
   }
 
+  async verifyOnRegisterPatientPageWithPatient(expectedName: string): Promise<void> {
+    await this.verifyOnRegisterPatientPage();
+    await this.verifyPanelDisplaysPatient(expectedName);
+    await this.waitForPelayananFormReady();
+  }
+
+  async openRegisterPatientCreateWithPatient(
+    patientName: string,
+    searchKeyword: string,
+  ): Promise<void> {
+    const isOnCreatePage = RegisterPatientData.url.registerPatientPage.test(this.page.url());
+
+    if (!isOnCreatePage) {
+      await this.navbar.openPendaftaranPasienV2();
+      await this.verifyOnPendaftaranListPage();
+      await this.clickTambahOnPendaftaranPage();
+      await this.searchExistingPatient(searchKeyword);
+      await this.selectExistingPatientFromSuggest(patientName);
+      return;
+    }
+
+    await this.verifyOnRegisterPatientPageWithPatient(patientName);
+  }
+
   async fillPelayananFormKunjunganSakit(): Promise<void> {
     const defaults = RegisterPatientData.pelayanan.defaults;
 
     await this.expectVisible(this.pelayananHeading);
-    await this.selectWaktuKunjunganHariIni();
-    await this.selectJenisKunjunganSakit();
-    await this.selectPenjaminIfEmpty(defaults.penjamin);
-    await this.selectSkriningVisualIfNeeded(defaults.skriningVisual);
+    await this.prepareKunjunganFormDefaults();
+    await this.selectJenisKunjungan("sakit");
     await this.selectInstalasi(defaults.instalasi);
     await this.selectPoliRuangan(defaults.poliRuangan);
     await this.selectRandomJadwalPraktik();
     await expect(this.btnLanjutkan).toBeEnabled({ timeout: ENV.TIMEOUT });
+  }
+
+  async prepareKunjunganFormDefaults(): Promise<void> {
+    const defaults = RegisterPatientData.pelayanan.defaults;
+
+    await this.expectVisible(this.pelayananHeading);
+    await this.selectWaktuKunjunganHariIni();
+    await this.selectPenjaminIfEmpty(defaults.penjamin);
+    await this.selectSkriningVisualIfNeeded(defaults.skriningVisual);
+  }
+
+  async selectJenisKunjungan(jenisKunjungan: string): Promise<void> {
+    const normalized = jenisKunjungan.toLowerCase();
+
+    if (normalized === "sakit") {
+      await this.selectJenisKunjunganSakit();
+      return;
+    }
+
+    if (normalized === "sehat") {
+      await this.selectJenisKunjunganSehat();
+      return;
+    }
+
+    throw new Error(`Jenis kunjungan '${jenisKunjungan}' belum didukung.`);
   }
 
   async selectInstalasi(instalasiName: string): Promise<void> {
@@ -216,6 +360,53 @@ export class RegisterPatientPage extends BasePage {
     await this.waitForJadwalPraktikOptions();
   }
 
+  async selectJadwalPraktikByLabel(label: string): Promise<string> {
+    await this.waitForJadwalPraktikOptions();
+
+    const normalizedLabel = label.trim().toLowerCase();
+    const isDokterHariIni =
+      normalizedLabel === RegisterPatientData.jadwal.dokterHariIniFeatureLabel.toLowerCase() ||
+      normalizedLabel.includes("hari ini");
+
+    if (isDokterHariIni) {
+      return this.selectFirstJadwalPraktik();
+    }
+
+    const matchingOption = this.jadwalPraktikOptions.filter({
+      hasText: new RegExp(escapeRegExp(label), "i"),
+    });
+
+    await expect(matchingOption.first()).toBeVisible({ timeout: ENV.TIMEOUT });
+
+    const selectedOption = matchingOption.first();
+    const selectedText = ((await selectedOption.innerText()) ?? "").replace(/\s+/g, " ").trim();
+
+    await selectedOption.scrollIntoViewIfNeeded();
+    await this.click(selectedOption);
+    await expect(selectedOption).toHaveClass(/radio-btn-selected/);
+
+    return selectedText;
+  }
+
+  private async selectFirstJadwalPraktik(): Promise<string> {
+    await this.waitForJadwalPraktikOptions();
+
+    const optionCount = await this.jadwalPraktikOptions.count();
+
+    if (optionCount === 0) {
+      throw new Error("Jadwal Praktik tidak memiliki opsi pilihan setelah memilih Poli Ruangan.");
+    }
+
+    const selectedOption = this.jadwalPraktikOptions.first();
+    const selectedText = ((await selectedOption.innerText()) ?? "").replace(/\s+/g, " ").trim();
+
+    await selectedOption.scrollIntoViewIfNeeded();
+    await this.click(selectedOption);
+    await expect(selectedOption).toHaveClass(/radio-btn-selected/);
+
+    return selectedText;
+  }
+
   async selectRandomJadwalPraktik(): Promise<string> {
     await this.waitForJadwalPraktikOptions();
 
@@ -234,6 +425,16 @@ export class RegisterPatientPage extends BasePage {
     await expect(selectedOption).toHaveClass(/radio-btn-selected/);
 
     return selectedText;
+  }
+
+  private async selectJenisKunjunganSehat(): Promise<void> {
+    const kunjunganSehatRadio = this.page.getByRole("radio", { name: "Kunjungan Sehat", exact: true });
+
+    if (!(await this.kunjunganSehat.isChecked())) {
+      await kunjunganSehatRadio.check();
+    }
+
+    await expect(this.kunjunganSehat).toBeChecked();
   }
 
   private async selectJenisKunjunganSakit(): Promise<void> {
@@ -299,6 +500,32 @@ export class RegisterPatientPage extends BasePage {
   async clickLanjutkanPendaftaran(): Promise<void> {
     await expect(this.btnLanjutkan).toBeEnabled();
     await this.click(this.btnLanjutkan);
+  }
+
+  async saveAndRegisterAnother(): Promise<void> {
+    await expect(this.btnSimpanDaftarkanLainnya).toBeEnabled({ timeout: ENV.TIMEOUT });
+    await this.click(this.btnSimpanDaftarkanLainnya);
+    await expect(this.lainnyaModal).toBeVisible({ timeout: ENV.TIMEOUT });
+    await this.click(this.lainnyaModalTutupButton);
+    await expect(this.lainnyaModal).toBeHidden({ timeout: ENV.TIMEOUT });
+  }
+
+  async verifyRegistrationSavedAfterDaftarkanLainnya(): Promise<void> {
+    const popup = this.sweetAlert.popup.first();
+
+    await popup.waitFor({ state: "visible", timeout: ENV.OPTIONAL_DIALOG_TIMEOUT }).catch(() => undefined);
+
+    if (await popup.isVisible().catch(() => false)) {
+      const message = (await this.sweetAlert.readMessage()) ?? "";
+
+      if (RegisterPatientData.alert.registrationFailurePattern.test(message)) {
+        await this.throwRegistrationAlertError("Pendaftaran pasien gagal", message);
+      }
+    }
+
+    await this.expectUrlMatches(RegisterPatientData.url.registerPatientPage);
+    await expect(this.lainnyaModal).toBeHidden();
+    await this.expectVisible(this.pelayananHeading);
   }
 
   async captureRegistrationAlertScreenshot(): Promise<Buffer | null> {

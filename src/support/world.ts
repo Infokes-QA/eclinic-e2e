@@ -7,7 +7,12 @@ import { CreatePatientPage } from "../pages/patient/CreatePatientPage";
 import { RegisterPatientPage } from "../pages/patient/RegisterPatientPage";
 import { PatientShowDetailPage } from "../pages/patient/PatientShowDetailPage";
 import { SearchPatientPage } from "../pages/patient/SearchPatientPage";
-import { CreatedPatientSnapshot, PatientFormInput } from "../types/patient.type";
+import { RawatJalanIgdPage } from "../pages/pelayanan/RawatJalanIgdPage";
+import {
+  CreatedPatientSnapshot,
+  PatientFormInput,
+  RegistrationSnapshot,
+} from "../types/patient.type";
 
 export class CustomWorld extends World {
   browser!: Browser;
@@ -18,12 +23,14 @@ export class CustomWorld extends World {
   landingPage!: LandingPage;
   createPatientPage!: CreatePatientPage;
   registerPatientPage!: RegisterPatientPage;
+  rawatJalanIgdPage!: RawatJalanIgdPage;
   searchPatientPage!: SearchPatientPage;
   patientShowDetailPage!: PatientShowDetailPage;
 
   authRole?: string;
   patientFormInput?: PatientFormInput;
   createdPatientSnapshot?: CreatedPatientSnapshot;
+  registrationSnapshot?: RegistrationSnapshot;
 
   terminalScenarioStartedAt?: number;
   terminalStepStartedAt?: number;

@@ -45,3 +45,20 @@ Feature: Registrasi Pasien
     When user memilih pelayanan kunjungan sakit
     And user melanjutkan pendaftaran pasien
     Then pendaftaran pasien berhasil
+
+  @regression @patient @positive @register-lengkap-form @register-lengkap-list @register-lengkap-pelayanan
+  Scenario Outline: Pendaftaran pasien lengkap ke kunjungan sakit
+    Given pasien dengan data "<jenisData>" sudah terdaftar
+    And user berada di halaman pendaftaran pasien
+    When user mendaftarkan pasien ke kunjungan "<jenisKunjungan>"
+    And user memilih tujuan pelayanan "<pelayanan>"
+    And user memilih unit pelayanan "<ruangan>"
+    And user memilih jadwal "<jadwal>"
+    And user menyimpan data pendaftaran
+    Then sistem berhasil menyimpan data pendaftaran pasien
+    And data pendaftaran tersedia pada daftar pendaftaran pasien
+    And data pelayanan tersedia pada daftar pelayanan "<pelayanan>"
+
+    Examples:
+      | jenisData | jenisKunjungan | pelayanan   | ruangan   | jadwal          |
+      | lengkap   | sakit          | Rawat Jalan | Poli Umum | Dokter Hari Ini |

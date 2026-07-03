@@ -4,6 +4,8 @@ import { PatientFixture } from "../../fixtures/patient.fixture";
 import { CreatePatientPage } from "../../pages/patient/CreatePatientPage";
 import { CustomWorld } from "../../support/world";
 
+const FORM_STEP_TIMEOUT = 60_000;
+
 function ensureCreatePatientPage(world: CustomWorld): CreatePatientPage {
   if (!world.createPatientPage) {
     world.createPatientPage = new CreatePatientPage(world.page);
@@ -81,7 +83,7 @@ When("user mengisi data pasien ringkas", async function (this: CustomWorld) {
 
 When(
   "user mengisi form Create Pasien dengan data lengkap",
-  { timeout: 120_000 },
+  { timeout: FORM_STEP_TIMEOUT },
   async function (this: CustomWorld) {
     const createPatientPage = ensureCreatePatientPage(this);
 
@@ -91,7 +93,7 @@ When(
 
 When(
   "user mengisi data pasien lengkap",
-  { timeout: 120_000 },
+  { timeout: FORM_STEP_TIMEOUT },
   async function (this: CustomWorld) {
     const createPatientPage = ensureCreatePatientPage(this);
 
@@ -101,7 +103,6 @@ When(
 
 When(
   "user menekan tombol Simpan Pasien",
-  { timeout: 120_000 },
   async function (this: CustomWorld) {
     const createPatientPage = ensureCreatePatientPage(this);
 
@@ -109,7 +110,7 @@ When(
   },
 );
 
-When("user menyimpan data pasien", { timeout: 120_000 }, async function (this: CustomWorld) {
+When("user menyimpan data pasien", async function (this: CustomWorld) {
   const createPatientPage = ensureCreatePatientPage(this);
 
   await createPatientPage.clickSavePatientButton();
@@ -149,7 +150,6 @@ Then("form Create Pasien menampilkan mode data lengkap", async function (this: C
 
 Then(
   "alert simpan pasien menampilkan hasil sukses",
-  { timeout: 120_000 },
   async function (this: CustomWorld) {
     const createPatientPage = ensureCreatePatientPage(this);
 
@@ -157,7 +157,7 @@ Then(
   },
 );
 
-Then("data pasien berhasil tersimpan", { timeout: 120_000 }, async function (this: CustomWorld) {
+Then("data pasien berhasil tersimpan", async function (this: CustomWorld) {
   const createPatientPage = ensureCreatePatientPage(this);
 
   await createPatientPage.verifySaveAlertSuccess();
@@ -171,7 +171,7 @@ Then("user berada di halaman pendaftaran create", async function (this: CustomWo
 
 Then(
   "halaman pendaftaran menampilkan data pasien yang dibuat",
-  { timeout: 120_000 },
+  { timeout: FORM_STEP_TIMEOUT },
   async function (this: CustomWorld) {
     if (!this.patientFormInput) {
       throw new Error("Data pasien belum tersedia. Jalankan step pengisian form terlebih dahulu.");
@@ -189,7 +189,6 @@ Then(
 
 Then(
   "panel Data Pasien menampilkan data pasien yang dibuat",
-  { timeout: 120_000 },
   async function (this: CustomWorld) {
     if (!this.patientFormInput) {
       throw new Error("Data pasien belum tersedia. Jalankan step pengisian form terlebih dahulu.");

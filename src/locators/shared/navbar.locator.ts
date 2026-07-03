@@ -25,7 +25,7 @@ export const NavbarLocator = {
 
   pelayanan: {
     medis: '#navbar a#menu_pelayanan_medis',
-    rawatJalanIgd: '#navbar a#menu_pemeriksaan_medis',
+    rawatJalanIgd: '#navbar a#menu_pemeriksaan_medis[href*="/pemeriksaanmedis"]',
     rawatInap: '#navbar a#menu_pemeriksaan_medis[href*="/rawatinap"]',
     laboratorium: '#navbar a#menu_pelayanan_laboratorium',
     radiologi: '#navbar a#menu_pelayanan_radiologi',

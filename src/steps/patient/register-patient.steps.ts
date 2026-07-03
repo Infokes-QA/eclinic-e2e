@@ -2,8 +2,18 @@ import { Given, Then, When } from "@cucumber/cucumber";
 
 import { RegisterPatientData } from "../../data/patient/register-patient.data";
 import { RegisterPatientPage } from "../../pages/patient/RegisterPatientPage";
+import { RawatJalanIgdPage } from "../../pages/pelayanan/RawatJalanIgdPage";
 import { runCreatePatientLengkapFlow } from "../../support/flows/create-patient-lengkap.flow";
+import {
+  ensurePatientRegisteredByJenisData,
+  isRawatJalanPelayanan,
+  resolveKunjunganValue,
+  resolveRuanganUiLabel,
+  updateRegistrationSnapshot,
+} from "../../support/flows/register-patient.flow";
 import { CustomWorld } from "../../support/world";
+
+const LONG_STEP_TIMEOUT = 120_000;
 
 function ensureRegisterPatientPage(world: CustomWorld): RegisterPatientPage {
   if (!world.registerPatientPage) {
@@ -13,17 +23,51 @@ function ensureRegisterPatientPage(world: CustomWorld): RegisterPatientPage {
   return world.registerPatientPage;
 }
 
+function ensureRawatJalanIgdPage(world: CustomWorld): RawatJalanIgdPage {
+  if (!world.rawatJalanIgdPage) {
+    world.rawatJalanIgdPage = new RawatJalanIgdPage(world.page);
+  }
+
+  return world.rawatJalanIgdPage;
+}
+
 Given(
   "pasien baru sudah dibuat di halaman pendaftaran create",
-  { timeout: 120_000 },
+  { timeout: LONG_STEP_TIMEOUT },
   async function (this: CustomWorld) {
     await runCreatePatientLengkapFlow(this);
   },
 );
 
-Given("pasien baru sudah dibuat", { timeout: 120_000 }, async function (this: CustomWorld) {
+Given("pasien baru sudah dibuat", { timeout: LONG_STEP_TIMEOUT }, async function (this: CustomWorld) {
   await runCreatePatientLengkapFlow(this);
 });
+
+Given(
+  "pasien dengan data {string} sudah terdaftar",
+  { timeout: LONG_STEP_TIMEOUT },
+  async function (this: CustomWorld, jenisData: string) {
+    await ensurePatientRegisteredByJenisData(this, jenisData);
+  },
+);
+
+Given(
+  "user berada di halaman pendaftaran pasien",
+  async function (this: CustomWorld) {
+    if (!this.createdPatientSnapshot) {
+      throw new Error(
+        "Data pasien belum tersedia. Jalankan step pasien dengan data terlebih dahulu.",
+      );
+    }
+
+    const registerPatientPage = ensureRegisterPatientPage(this);
+
+    await registerPatientPage.openRegisterPatientCreateWithPatient(
+      this.createdPatientSnapshot.nama,
+      this.createdPatientSnapshot.nama,
+    );
+  },
+);
 
 When(
   "user membuka halaman Pendaftaran melalui menu {string} dan submenu {string}",
@@ -98,13 +142,13 @@ When(
   },
 );
 
-When("user mengisi form Data Pelayanan dengan kunjungan sakit", { timeout: 120_000 }, async function (this: CustomWorld) {
+When("user mengisi form Data Pelayanan dengan kunjungan sakit", async function (this: CustomWorld) {
   const registerPatientPage = ensureRegisterPatientPage(this);
 
   await registerPatientPage.fillPelayananFormKunjunganSakit();
 });
 
-When("user memilih pelayanan kunjungan sakit", { timeout: 120_000 }, async function (this: CustomWorld) {
+When("user memilih pelayanan kunjungan sakit", async function (this: CustomWorld) {
   const registerPatientPage = ensureRegisterPatientPage(this);
 
   await registerPatientPage.fillPelayananFormKunjunganSakit();
@@ -112,7 +156,6 @@ When("user memilih pelayanan kunjungan sakit", { timeout: 120_000 }, async funct
 
 When(
   "user memilih instalasi {string} pada form pendaftaran",
-  { timeout: 120_000 },
   async function (this: CustomWorld, instalasiName: string) {
     const registerPatientPage = ensureRegisterPatientPage(this);
 
@@ -122,7 +165,6 @@ When(
 
 When(
   "user memilih poli ruangan {string} pada form pendaftaran",
-  { timeout: 120_000 },
   async function (this: CustomWorld, poliName: string) {
     const registerPatientPage = ensureRegisterPatientPage(this);
 
@@ -132,7 +174,6 @@ When(
 
 When(
   "user memilih jadwal praktik pada form pendaftaran",
-  { timeout: 120_000 },
   async function (this: CustomWorld) {
     const registerPatientPage = ensureRegisterPatientPage(this);
 
@@ -140,16 +181,70 @@ When(
   },
 );
 
-When("user menekan tombol Lanjutkan pendaftaran", { timeout: 120_000 }, async function (this: CustomWorld) {
+When("user menekan tombol Lanjutkan pendaftaran", async function (this: CustomWorld) {
   const registerPatientPage = ensureRegisterPatientPage(this);
 
   await registerPatientPage.clickLanjutkanPendaftaran();
 });
 
-When("user melanjutkan pendaftaran pasien", { timeout: 120_000 }, async function (this: CustomWorld) {
+When("user melanjutkan pendaftaran pasien", async function (this: CustomWorld) {
   const registerPatientPage = ensureRegisterPatientPage(this);
 
   await registerPatientPage.clickLanjutkanPendaftaran();
+});
+
+When(
+  "user mendaftarkan pasien ke kunjungan {string}",
+  async function (this: CustomWorld, jenisKunjungan: string) {
+    const registerPatientPage = ensureRegisterPatientPage(this);
+
+    await registerPatientPage.prepareKunjunganFormDefaults();
+    await registerPatientPage.selectJenisKunjungan(jenisKunjungan);
+    updateRegistrationSnapshot(this, {
+      kunjungan: resolveKunjunganValue(jenisKunjungan),
+    });
+  },
+);
+
+When(
+  "user memilih tujuan pelayanan {string}",
+  async function (this: CustomWorld, pelayanan: string) {
+    const registerPatientPage = ensureRegisterPatientPage(this);
+
+    await registerPatientPage.selectInstalasi(pelayanan);
+    updateRegistrationSnapshot(this, { pelayanan });
+  },
+);
+
+When(
+  "user memilih unit pelayanan {string}",
+  async function (this: CustomWorld, ruangan: string) {
+    const registerPatientPage = ensureRegisterPatientPage(this);
+    const ruanganUiLabel = resolveRuanganUiLabel(ruangan);
+
+    await registerPatientPage.selectPoliRuangan(ruangan);
+    updateRegistrationSnapshot(this, { ruangan: ruanganUiLabel });
+  },
+);
+
+When(
+  "user memilih jadwal {string}",
+  async function (this: CustomWorld, jadwal: string) {
+    const registerPatientPage = ensureRegisterPatientPage(this);
+    const selectedJadwal = await registerPatientPage.selectJadwalPraktikByLabel(jadwal);
+    const dokterMatch = selectedJadwal.match(/^(.+?)\s+\d{2}:\d{2}/);
+
+    updateRegistrationSnapshot(this, {
+      jadwal: selectedJadwal,
+      dokter: dokterMatch?.[1]?.trim(),
+    });
+  },
+);
+
+When("user menyimpan data pendaftaran", async function (this: CustomWorld) {
+  const registerPatientPage = ensureRegisterPatientPage(this);
+
+  await registerPatientPage.saveAndRegisterAnother();
 });
 
 Then("user berada di halaman registrasi pasien", async function (this: CustomWorld) {
@@ -181,7 +276,6 @@ Then("panel Data Pasien menampilkan pasien yang baru dibuat", async function (th
 
 Then(
   "pendaftaran pasien berhasil",
-  { timeout: 120_000 },
   async function (this: CustomWorld) {
     const registerPatientPage = ensureRegisterPatientPage(this);
 
@@ -199,5 +293,67 @@ Then(
 
       throw error;
     }
+  },
+);
+
+Then(
+  "sistem berhasil menyimpan data pendaftaran pasien",
+  async function (this: CustomWorld) {
+    const registerPatientPage = ensureRegisterPatientPage(this);
+
+    try {
+      await registerPatientPage.verifyRegistrationSavedAfterDaftarkanLainnya();
+    } catch (error) {
+      const alertScreenshot = await registerPatientPage.captureRegistrationAlertScreenshot();
+
+      if (alertScreenshot) {
+        await this.attach(alertScreenshot, {
+          mediaType: "image/png",
+          fileName: `${RegisterPatientData.alert.screenshotFileName}-failed.png`,
+        });
+      }
+
+      throw error;
+    }
+  },
+);
+
+Then(
+  "data pendaftaran tersedia pada daftar pendaftaran pasien",
+  async function (this: CustomWorld) {
+    if (!this.registrationSnapshot) {
+      throw new Error(
+        "Registration snapshot belum tersedia. Jalankan step pendaftaran terlebih dahulu.",
+      );
+    }
+
+    const registerPatientPage = ensureRegisterPatientPage(this);
+    const noPendaftaran = await registerPatientPage.verifyRegistrationOnPendaftaranList(
+      this.registrationSnapshot,
+    );
+
+    updateRegistrationSnapshot(this, { noPendaftaran });
+  },
+);
+
+Then(
+  "data pelayanan tersedia pada daftar pelayanan {string}",
+  async function (this: CustomWorld, pelayanan: string) {
+    if (!this.registrationSnapshot) {
+      throw new Error(
+        "Registration snapshot belum tersedia. Jalankan step pendaftaran terlebih dahulu.",
+      );
+    }
+
+    if (!isRawatJalanPelayanan(pelayanan)) {
+      throw new Error(`Daftar pelayanan '${pelayanan}' belum didukung.`);
+    }
+
+    const rawatJalanIgdPage = ensureRawatJalanIgdPage(this);
+    const noAntrean = await rawatJalanIgdPage.verifyPatientInPelayananList(
+      this.registrationSnapshot,
+    );
+
+    updateRegistrationSnapshot(this, { noAntrean });
   },
 );
