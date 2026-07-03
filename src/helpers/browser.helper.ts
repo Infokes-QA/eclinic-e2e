@@ -3,7 +3,7 @@ import { Browser, BrowserContext, BrowserType, chromium, firefox, webkit } from 
 import { ENV } from "../config/env";
 
 export class BrowserHelper {
-  static async launchBrowser(): Promise<Browser> {
+  static async launchBrowser(options?: { headless?: boolean }): Promise<Browser> {
     let browser: BrowserType;
 
     switch (ENV.BROWSER.toLowerCase()) {
@@ -21,9 +21,10 @@ export class BrowserHelper {
         break;
     }
 
+    const headless = options?.headless ?? ENV.HEADLESS;
     const launchOptions: Parameters<BrowserType["launch"]>[0] = {
-      headless: ENV.HEADLESS,
-      slowMo: ENV.HEADLESS ? 0 : 300,
+      headless,
+      slowMo: headless ? 0 : 300,
     };
 
     if (browser === chromium) {

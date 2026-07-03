@@ -5,7 +5,42 @@ Feature: Registrasi Pasien
     Given user sudah login sebagai "admin"
 
   @regression @patient @positive
-  Scenario: User dapat mendaftarkan pasien dengan kunjungan sakit
+  Scenario: User dapat membuka halaman pendaftaran create dari menu Pendaftaran
+    When user membuka halaman Pendaftaran melalui menu "pendaftaran" dan submenu "pendaftaranPasienV2"
+    And user menekan tombol Tambah pada halaman Pendaftaran
+    Then user berada di halaman pendaftaran create
+
+  @regression @patient @positive @existing-patient
+  Scenario Outline: User dapat memilih pasien existing melalui pencarian pendaftaran
+    When user membuka halaman Pendaftaran melalui menu "pendaftaran" dan submenu "pendaftaranPasienV2"
+    And user menekan tombol Tambah pada halaman Pendaftaran
+    Then user berada di halaman pendaftaran create
+    When user mencari pasien existing pada pendaftaran dengan kata kunci "<keyword>"
+    And user memilih pasien "<expectedName>" dari hasil pencarian pendaftaran
+    Then panel Data Pasien menampilkan pasien "<expectedName>"
+
+    Examples:
+      | keyword | expectedName          |
+      | Fakhri  | FAKHRI ARIA FADHILLAH |
+
+  @regression @patient @positive @existing-patient
+  Scenario Outline: User dapat mendaftarkan pasien existing dengan kunjungan sakit
+    When user membuka halaman Pendaftaran melalui menu "pendaftaran" dan submenu "pendaftaranPasienV2"
+    And user menekan tombol Tambah pada halaman Pendaftaran
+    Then user berada di halaman pendaftaran create
+    When user mencari pasien existing pada pendaftaran dengan kata kunci "<keyword>"
+    And user memilih pasien "<expectedName>" dari hasil pencarian pendaftaran
+    And user memilih pelayanan kunjungan sakit
+    And user melanjutkan pendaftaran pasien
+    Then pendaftaran pasien berhasil
+
+    Examples:
+      | keyword | expectedName          |
+      | Fakhri  | FAKHRI ARIA FADHILLAH |
+
+
+  @regression @patient @positive
+  Scenario: User dapat mendaftarkan pasien baru dengan kunjungan sakit
     Given pasien baru sudah dibuat
     When user memilih pelayanan kunjungan sakit
     And user melanjutkan pendaftaran pasien

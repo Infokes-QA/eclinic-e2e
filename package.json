@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "e2e": "ts-node src/runner/runner.ts",
-    "test": "ts-node src/runner/runner.ts",
+    "e2e": "ts-node src/runner/runner.ts --headed",
+    "test": "ts-node src/runner/runner.ts --headed",
     "test:headed": "ts-node src/runner/runner.ts --headed",
     "test:headless": "ts-node src/runner/runner.ts",
     "lint": "eslint .",
@@ -13,7 +13,7 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "auth:setup": "ts-node src/scripts/auth.setup.ts",
+    "auth:setup": "cross-env HEADLESS=true ts-node src/scripts/auth.setup.ts",
     "check": "npm run lint && npm run type-check",
     "report:generate": "ts-node src/scripts/generate-report.ts",
     "report:open": "start reports/cucumber/html/index.html"

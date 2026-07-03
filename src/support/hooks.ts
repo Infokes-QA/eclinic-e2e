@@ -235,7 +235,7 @@ function scenarioUsesAuthState(tagNames: string[]): boolean {
   return tagNames.includes("@authenticated") || tagNames.includes("@requiresAuth");
 }
 
-Before(async function (this: CustomWorld, scenario) {
+Before({ timeout: Math.max(ENV.TIMEOUT * 4, 60_000) }, async function (this: CustomWorld, scenario) {
   const tagNames = scenario.pickle.tags.map((tag) => tag.name);
   const useAuthState = scenarioUsesAuthState(tagNames) && !tagNames.includes("@login");
 
@@ -253,6 +253,8 @@ Before(async function (this: CustomWorld, scenario) {
   this.browser = await BrowserHelper.launchBrowser();
 
   if (useAuthState) {
+    logProgress("[SETUP] Preparing authenticated session...");
+
     const role = "admin";
     const statePath = await AuthHelper.ensureValidAuthState(role);
     this.context = await BrowserHelper.createContext(this.browser, statePath);
@@ -349,7 +351,7 @@ After(async function (this: CustomWorld, scenario) {
     await this.attach(`Screenshot gagal diambil: ${message}`, "text/plain");
   }
 
-  if (isFailed) {
+  if (isFailed && this.context) {
     const traceDir = "test-results/traces";
     if (!fs.existsSync(traceDir)) {
       fs.mkdirSync(traceDir, { recursive: true });
@@ -358,7 +360,7 @@ After(async function (this: CustomWorld, scenario) {
     await this.context.tracing.stop({
       path: tracePath,
     });
-  } else {
+  } else if (this.context) {
     await this.context.tracing.stop();
   }
 

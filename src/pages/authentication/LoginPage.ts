@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import { ENV } from "../../config/env";
 import { UrlHelper } from "../../config/url";
 import { LoginData } from "../../data/authentication/login.data";
@@ -53,8 +53,14 @@ export class LoginPage extends BasePage {
     await this.clinicInput.click();
     await this.clinicInput.clear();
     await this.fill(this.clinicInput, clinicName);
-    await this.page.keyboard.press("ArrowDown");
-    await this.page.keyboard.press("Enter");
+
+    const clinicOption = this.page.locator("li.ui-menu-item").filter({
+      hasText: new RegExp(`^${escapeRegExp(clinicName)}$`, "i"),
+    });
+
+    await clinicOption.first().waitFor({ state: "visible", timeout: ENV.TIMEOUT });
+    await clinicOption.first().click();
+    await expect(this.clinicInput).toHaveValue(clinicName);
   }
 
   async fillUsername(username: string): Promise<void> {
@@ -66,7 +72,7 @@ export class LoginPage extends BasePage {
   }
 
   async clickLoginButton(): Promise<void> {
-    await this.click(this.loginButton);
+    await this.loginButton.click({ noWaitAfter: true });
   }
 
   async loginAs(user: UserCredential): Promise<void> {
@@ -87,4 +93,8 @@ export class LoginPage extends BasePage {
     await this.expectVisible(this.usernameInput);
     await this.expectVisible(this.passwordInput);
   }
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

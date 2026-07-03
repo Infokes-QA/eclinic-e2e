@@ -30,6 +30,11 @@ export const PatientFixture = {
     submenu: "pasien",
   } as const,
 
+  registerPatientNavigation: {
+    menu: "pendaftaran",
+    submenu: "pendaftaranPasienV2",
+  } as const,
+
   searchPatientSamples: {
     ruslani: {
       name: "RUSLANI",

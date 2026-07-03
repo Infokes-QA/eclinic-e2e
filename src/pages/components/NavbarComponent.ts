@@ -46,6 +46,10 @@ export class NavbarComponent {
     await this.clickSubmenu("pendaftaran", "createPasien");
   }
 
+  async openPendaftaranPasienV2(): Promise<void> {
+    await this.clickSubmenu("pendaftaran", "pendaftaranPasienV2");
+  }
+
   async openPasien(): Promise<void> {
     await this.clickSubmenu("pendaftaran", "pasien");
   }
