@@ -1,11 +1,15 @@
 export const RegisterPatientData = {
   url: {
+    pendaftaranListPage: /\/pendaftaran\/v2(\?.*)?$/,
     registerPatientPage: /\/pendaftaran\/v2\/create(\?.*)?$/,
   },
 
   alert: {
     registrationSuccessPattern: /berhasil|sukses|success/i,
     registrationFailurePattern: /gagal|error|invalid|tidak valid/i,
+    queuePrintModalPattern: /cetak nomor antrian/i,
+    queuePrintContinueButton: "Lanjutkan Ke Pelayanan",
+    screenshotFileName: "alert-pendaftaran-pasien",
   },
 
   pelayanan: {
@@ -17,7 +21,8 @@ export const RegisterPatientData = {
       jenisKunjunganSehat: "SEHAT",
       penjamin: "umum",
       instalasi: "Rawat Jalan",
-      poliRuangan: "Poli Umum",
+      poliRuangan: "Poli Umum - Pagi",
+      skriningVisual: "Pasien stabil",
     },
     poliPlaceholderText: "Silahkan pilih instalasi terlebih dahulu",
   },

@@ -1,6 +1,7 @@
 import { Locator, Page } from "@playwright/test";
 
 import { ENV } from "../../config/env";
+import { ScreenshotHelper } from "../../helpers/screenshot.helper";
 import { SweetAlertLocator } from "../../locators/shared/sweet-alert.locator";
 
 export class SweetAlertComponent {
@@ -16,6 +17,34 @@ export class SweetAlertComponent {
     this.confirmButton = page.locator(SweetAlertLocator.confirm);
     this.cancelButton = page.locator(SweetAlertLocator.cancel);
     this.actionButton = page.locator(SweetAlertLocator.actionButton);
+  }
+
+  async isPopupVisible(): Promise<boolean> {
+    return this.popup.first().isVisible();
+  }
+
+  async readMessage(): Promise<string | null> {
+    const popup = this.popup.first();
+
+    if (!(await popup.isVisible())) {
+      return null;
+    }
+
+    const title = (await popup.locator(".swal2-title").textContent()) ?? "";
+    const content = (await popup.locator(".swal2-html-container").textContent()) ?? "";
+    const message = `${title} ${content}`.replace(/\s+/g, " ").trim();
+
+    return message || null;
+  }
+
+  async captureVisiblePopup(fileName: string): Promise<Buffer | null> {
+    const popup = this.popup.first();
+
+    if (!(await popup.isVisible())) {
+      return null;
+    }
+
+    return ScreenshotHelper.captureLocator(popup, fileName);
   }
 
   async closeIfVisible(): Promise<void> {

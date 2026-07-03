@@ -162,7 +162,7 @@ export class AuthHelper {
       throw new Error(`User role '${role}' tidak ditemukan di users.fixture.ts`);
     }
 
-    const browser = await BrowserHelper.launchBrowser();
+    const browser = await BrowserHelper.launchBrowser({ headless: true });
     const context = await BrowserHelper.createContext(browser);
     const page = await context.newPage();
     page.setDefaultTimeout(ENV.TIMEOUT);
@@ -184,7 +184,7 @@ export class AuthHelper {
 
   static async ensureValidAuthState(role: string): Promise<string> {
     const statePath = await this.ensureAuthState(role);
-    const browser = await BrowserHelper.launchBrowser();
+    const browser = await BrowserHelper.launchBrowser({ headless: true });
     const context = await BrowserHelper.createContext(browser, statePath);
     const page = await context.newPage();
     page.setDefaultTimeout(ENV.TIMEOUT);
