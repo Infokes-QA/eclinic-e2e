@@ -1,6 +1,7 @@
 export const RegisterPatientLocator = {
   page: {
     panelTitle: '.panel-title:has-text("Pendaftaran")',
+    listPanelTitle: '.panel-title:has-text("Pendaftaran Pasien")',
     tambah: "#button_create",
   },
 
@@ -42,10 +43,30 @@ export const RegisterPatientLocator = {
     jadwalPraktikOption:
       ".col-md-9 .row.pilih-poli > .col-sm-12:nth-child(3) .poli-card button",
     btnLanjutkan: '.col-md-9 .form-cta-wrapper button.btn-primary:has-text("Lanjutkan")',
+    btnSimpanDaftarkanLainnya:
+      '.col-md-9 .form-cta-wrapper button.btn-info.bordered:has-text("Simpan & Daftarkan Lainnya")',
+  },
+
+  lainnyaModal: {
+    dialog: "#lainnya-modal",
+    heading: '#lainnya-modal label strong:has-text("Cetak Nomor Antrian?")',
+    tutupButton: '#lainnya-modal .modal-footer button.btn-info.bordered:has-text("Tutup")',
+    cetakButton: "#lainnya-modal #print_1",
   },
 
   queuePrintModal: {
     dialog: ".modal-dialog:visible",
     continueButton: ".modal-dialog:visible #lanjutkan_btn",
+  },
+
+  list: {
+    wrapper: "#datatableWrapper",
+    searchForm: "#form_search",
+    searchInput: '#form_search input[name="searchKey"]',
+    searchButton: "#button_cari",
+    statusPeriksaSelect: "#status_periksa",
+    ruanganSelect: '#form_search select[name="ruangan_id"]',
+    table: "#datatableWrapper table.datatable",
+    tableBodyRow: "#datatableWrapper table.datatable tbody tr",
   },
 } as const;

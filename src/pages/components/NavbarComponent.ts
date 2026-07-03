@@ -53,6 +53,10 @@ export class NavbarComponent {
   async openPasien(): Promise<void> {
     await this.clickSubmenu("pendaftaran", "pasien");
   }
+
+  async openRawatJalanIgd(): Promise<void> {
+    await this.clickSubmenu("pelayanan", "rawatJalanIgd");
+  }
 }
 
 function pageLocator(page: Page, selector: string): Locator {
