@@ -28,7 +28,7 @@ export class LoginPage extends BasePage {
     this.sweetAlert = new SweetAlertComponent(page);
   }
 
-  async openLoginPage(): Promise<void> {
+  async openLoginPage(): Promise<void> { 
     await this.goTo(UrlHelper.get("login"));
   }
 

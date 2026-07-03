@@ -23,4 +23,4 @@ When(
 Then("user berada di halaman Login", async function (this: CustomWorld) {
   this.loginPage = new LoginPage(this.page);
   await this.loginPage.verifyLoginPageDisplayed();
-});
+}); 
