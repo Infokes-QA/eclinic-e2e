@@ -1,10 +1,8 @@
 Feature: Authentication
 
-  Background:
-    Given user berada di halaman Landing Page
-
-  @smoke @login @positive
+  @smoke @login @positive @login-via-landing
   Scenario Outline: Login berhasil menggunakan akun Admin
+    Given user berada di halaman Landing Page
     When user hover menu "<menu>"
     And user memilih submenu "<submenu>" pada menu "<menu>"
     Then user berada di halaman Login
@@ -15,8 +13,15 @@ Feature: Authentication
       | menu              | submenu |
       | patientManagement | pratama |
 
+  @smoke @login @positive @login-direct
+  Scenario: Login berhasil langsung dari halaman Login
+    Given user berada di halaman Login
+    When user login menggunakan akun "admin"
+    Then user berhasil masuk ke Halaman Dashboard
+
   @login @negative
   Scenario Outline: Login gagal menggunakan data invalid
+    Given user berada di halaman Landing Page
     When user hover menu "<menu>"
     And user memilih submenu "<submenu>" pada menu "<menu>"
     Then user berada di halaman Login
@@ -30,4 +35,4 @@ Feature: Authentication
       | menu              | submenu | clinic         | username | password   |
       | patientManagement | pratama | Klinik A dev 4 | salah    | salah      |
       | patientManagement | pratama | Klinik A dev 4 | 123123   | salah      |
-      | patientManagement | pratama | Klinik A dev 4 | salah    | Klinik123$ |
+      | patientManagement | pratama | Klinik A dev 4 | salah    | invalid-password |

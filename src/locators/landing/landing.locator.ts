@@ -1,4 +1,4 @@
-export const LandingPageLocator = {
+export const LandingLocator = {
   menu: {
     patientManagement: {
       title: "#services ul.bg-primary-2",

@@ -1,11 +1,9 @@
 export const LoginLocator = {
   loginPageEclinic: {
     clinicInput: "#nama-faskes",
+    clinicAutocompleteItem: "li.ui-menu-item",
     usernameInput: "#email",
     passwordInput: "#password",
     loginButton: "#login",
-
-    notification: '[data-notify="container"]',
-    notificationMessage: '[data-notify="message"]',
   },
-};
+} as const;

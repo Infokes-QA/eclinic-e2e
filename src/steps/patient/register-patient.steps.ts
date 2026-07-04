@@ -1,6 +1,7 @@
 import { Given, Then, When } from "@cucumber/cucumber";
 
-import { RegisterPatientData } from "../../data/patient/register-patient.data";
+import { ENV } from "../../config/env";
+import { PatientFixture } from "../../fixtures/patient.fixture";
 import { RegisterPatientPage } from "../../pages/patient/RegisterPatientPage";
 import { RawatJalanIgdPage } from "../../pages/pelayanan/RawatJalanIgdPage";
 import { runCreatePatientLengkapFlow } from "../../support/flows/create-patient-lengkap.flow";
@@ -10,10 +11,9 @@ import {
   resolveKunjunganValue,
   resolveRuanganUiLabel,
   updateRegistrationSnapshot,
+  verifyRegistrationWithAlertDiagnostic,
 } from "../../support/flows/register-patient.flow";
 import { CustomWorld } from "../../support/world";
-
-const LONG_STEP_TIMEOUT = 120_000;
 
 function ensureRegisterPatientPage(world: CustomWorld): RegisterPatientPage {
   if (!world.registerPatientPage) {
@@ -33,19 +33,19 @@ function ensureRawatJalanIgdPage(world: CustomWorld): RawatJalanIgdPage {
 
 Given(
   "pasien baru sudah dibuat di halaman pendaftaran create",
-  { timeout: LONG_STEP_TIMEOUT },
+  { timeout: ENV.STEP_TIMEOUT_LONG },
   async function (this: CustomWorld) {
     await runCreatePatientLengkapFlow(this);
   },
 );
 
-Given("pasien baru sudah dibuat", { timeout: LONG_STEP_TIMEOUT }, async function (this: CustomWorld) {
+Given("pasien baru sudah dibuat", { timeout: ENV.STEP_TIMEOUT_LONG }, async function (this: CustomWorld) {
   await runCreatePatientLengkapFlow(this);
 });
 
 Given(
   "pasien dengan data {string} sudah terdaftar",
-  { timeout: LONG_STEP_TIMEOUT },
+  { timeout: ENV.STEP_TIMEOUT_LONG },
   async function (this: CustomWorld, jenisData: string) {
     await ensurePatientRegisteredByJenisData(this, jenisData);
   },
@@ -78,6 +78,19 @@ When(
   },
 );
 
+When("user membuka halaman daftar pendaftaran pasien", async function (this: CustomWorld) {
+  const registerPatientPage = ensureRegisterPatientPage(this);
+  const { menu, submenu } = PatientFixture.registerPatientNavigation;
+
+  await registerPatientPage.openFromNavbar(menu, submenu);
+});
+
+When("user menekan tombol Tambah pada halaman pendaftaran", async function (this: CustomWorld) {
+  const registerPatientPage = ensureRegisterPatientPage(this);
+
+  await registerPatientPage.clickTambahOnPendaftaranPage();
+});
+
 When("user menekan tombol Tambah pada halaman Pendaftaran", async function (this: CustomWorld) {
   const registerPatientPage = ensureRegisterPatientPage(this);
 
@@ -103,18 +116,8 @@ When(
     }
 
     const registerPatientPage = ensureRegisterPatientPage(this);
-    const normalizedCriteria = criteria.toLowerCase();
 
-    if (normalizedCriteria !== "nama" && normalizedCriteria !== "nik") {
-      throw new Error(`Kriteria pencarian pendaftaran '${criteria}' belum didukung.`);
-    }
-
-    const keyword =
-      normalizedCriteria === "nik"
-        ? this.createdPatientSnapshot.nik
-        : this.createdPatientSnapshot.nama;
-
-    await registerPatientPage.searchExistingPatient(keyword);
+    await registerPatientPage.searchCreatedPatientByCriteria(criteria, this.createdPatientSnapshot);
   },
 );
 
@@ -279,20 +282,9 @@ Then(
   async function (this: CustomWorld) {
     const registerPatientPage = ensureRegisterPatientPage(this);
 
-    try {
-      await registerPatientPage.verifyPendaftaranSuccess();
-    } catch (error) {
-      const alertScreenshot = await registerPatientPage.captureRegistrationAlertScreenshot();
-
-      if (alertScreenshot) {
-        await this.attach(alertScreenshot, {
-          mediaType: "image/png",
-          fileName: `${RegisterPatientData.alert.screenshotFileName}-failed.png`,
-        });
-      }
-
-      throw error;
-    }
+    await verifyRegistrationWithAlertDiagnostic(this, registerPatientPage, () =>
+      registerPatientPage.verifyPendaftaranSuccess(),
+    );
   },
 );
 
@@ -301,20 +293,9 @@ Then(
   async function (this: CustomWorld) {
     const registerPatientPage = ensureRegisterPatientPage(this);
 
-    try {
-      await registerPatientPage.verifyRegistrationSavedAfterDaftarkanLainnya();
-    } catch (error) {
-      const alertScreenshot = await registerPatientPage.captureRegistrationAlertScreenshot();
-
-      if (alertScreenshot) {
-        await this.attach(alertScreenshot, {
-          mediaType: "image/png",
-          fileName: `${RegisterPatientData.alert.screenshotFileName}-failed.png`,
-        });
-      }
-
-      throw error;
-    }
+    await verifyRegistrationWithAlertDiagnostic(this, registerPatientPage, () =>
+      registerPatientPage.verifyRegistrationSavedAfterDaftarkanLainnya(),
+    );
   },
 );
 

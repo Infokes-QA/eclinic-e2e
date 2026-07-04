@@ -8,6 +8,36 @@ export const CreatePatientData = {
     title: "Buat Pasien Baru",
   },
 
+  placeholder: {
+    noDokumenRM: "Nomor Dokumen Rekam Medis",
+    noRMLama: "Nomor Rekam Medis Lama",
+    noKK: "Nomor KK / NIK Anggota Keluarga",
+    nik: "Nomor Induk Kependudukan (KTP)",
+    nama: "Nama lengkap",
+    tempatLahir: "Tempat lahir",
+    noHP: "Nomor HP",
+    alamatDomisili: "Alamat Domisili",
+    propinsi: "Nama Propinsi",
+    kotaKab: "Nama Kota / Kabupaten",
+    kecamatan: "Nama Kecamatan",
+    kelurahanDesa: "Nama Kelurahan / Desa",
+    pekerjaan: "Pekerjaan",
+    email: "emailpasien@email.com",
+    namaAyah: "Nama Ayah",
+    namaIbu: "Nama Ibu",
+    hubunganKeluarga: "Hubungan Keluarga",
+    negaraAsal: "Negara Asal",
+    noPaspor: "No Paspor",
+    ihsNumber: "IHS Number",
+  },
+
+  linkLabel: {
+    tambahAsuransi: "Tambah Asuransi/Penjamin",
+    inputAlamatLengkap: "Input data alamat lengkap",
+    inputDataLainnya: "Input data lainnya",
+    sembunyikan: "Sembunyikan",
+  },
+
   alert: {
     saveSuccessMessage: /Data berhasil disimpan/i,
     saveFailurePattern: /gagal|error|invalid|tidak valid/i,
@@ -71,25 +101,9 @@ export const CreatePatientData = {
     spaceTriggerCount: 3,
   },
 
-  alamatLengkap: {
-    rt: "001",
-    rw: "002",
-    propinsi: "JAWA BARAT",
-    kotaKab: "KOTA BANDUNG",
-    kecamatan: "BUAHBATU",
-    kelurahanDesa: "SEKEJATI",
-  },
-
-  defaults: {
-    wargaNegara: "INDONESIA",
-  },
-
-  patientIdentity: {
-    namePrefix: "Pasien Auto",
-    fatherLabel: "Ayah",
-    motherLabel: "Ibu",
-    emailPrefix: "PasienAuto",
-    emailDomain: "yopmail.com",
-    sequenceLength: 3,
-  },
+  jenisData: {
+    lengkap: "lengkap",
+  } as const,
 } as const;
+
+export type CreatePatientJenisData = keyof typeof CreatePatientData.jenisData;

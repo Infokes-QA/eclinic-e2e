@@ -1,4 +1,4 @@
-import { CreatePatientData } from "../data/patient/create-patient.data";
+import { PatientFormDefaults } from "../fixtures/patient.fixture";
 import {
   PatientAgama,
   PatientGender,
@@ -103,7 +103,7 @@ export class RandomHelper {
    */
   public static generatePatientIdentity(): PatientIdentity {
     const { namePrefix, fatherLabel, motherLabel, emailPrefix, emailDomain, sequenceLength } =
-      CreatePatientData.patientIdentity;
+      PatientFormDefaults.patientIdentity;
     const sequence = this.generateRandomNumber(sequenceLength);
 
     return {

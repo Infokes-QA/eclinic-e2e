@@ -1,15 +1,41 @@
 import { RegisterPatientData } from "../../data/patient/register-patient.data";
 import { RawatJalanIgdData } from "../../data/pelayanan/rawat-jalan-igd.data";
+import { RegisterFormDefaults } from "../../fixtures/patient.fixture";
+import { RegisterPatientPage } from "../../pages/patient/RegisterPatientPage";
 import { RegistrationSnapshot } from "../../types/patient.type";
 import { CustomWorld } from "../world";
 import { runCreatePatientLengkapFlow } from "./create-patient-lengkap.flow";
+
+export async function verifyRegistrationWithAlertDiagnostic(
+  world: CustomWorld,
+  registerPatientPage: RegisterPatientPage,
+  verifyFn: () => Promise<void>,
+): Promise<void> {
+  try {
+    await verifyFn();
+  } catch (error) {
+    const alertScreenshot = await registerPatientPage.captureRegistrationAlertScreenshot();
+
+    if (alertScreenshot) {
+      await world.attach(alertScreenshot, {
+        mediaType: "image/png",
+        fileName: `${RegisterPatientData.alert.screenshotFileName}-failed.png`,
+      });
+    }
+
+    throw error;
+  }
+}
 
 export async function ensurePatientRegisteredByJenisData(
   world: CustomWorld,
   jenisData: string,
 ): Promise<void> {
   if (jenisData === RegisterPatientData.jenisData.lengkap) {
-    await runCreatePatientLengkapFlow(world);
+    if (!world.createdPatientSnapshot) {
+      await runCreatePatientLengkapFlow(world);
+    }
+
     world.registrationSnapshot = initRegistrationSnapshotFromCreatedPatient(world);
     return;
   }
@@ -76,6 +102,6 @@ export function resolveKunjunganValue(jenisKunjungan: string): string {
 export function isRawatJalanPelayanan(pelayanan: string): boolean {
   return (
     pelayanan === RawatJalanIgdData.pelayananFeatureLabel.rawatJalan ||
-    pelayanan === RegisterPatientData.pelayanan.defaults.instalasi
+    pelayanan === RegisterFormDefaults.instalasi
   );
 }
