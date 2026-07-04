@@ -173,6 +173,28 @@ export class SearchPatientPage extends BasePage {
     await this.searchPatient(keyword);
   }
 
+  async verifyCreatedPatientListed(snapshot: CreatedPatientSnapshot): Promise<void> {
+    await this.verifyTableDisplayed();
+    await this.verifyFooterHasSearchResults();
+
+    const patientRow = await this.findCreatedPatientRow(snapshot);
+
+    await expect(patientRow).toBeVisible({ timeout: ENV.TIMEOUT });
+  }
+
+  async openPatientListAndSearchCreatedPatient(snapshot: CreatedPatientSnapshot): Promise<void> {
+    const { menu, submenu } = PatientFixture.searchPatientNavigation;
+
+    await this.openFromNavbar(menu, submenu);
+    await this.verifyOnPatientPage();
+    await this.searchCreatedPatient(snapshot, SearchPatientData.searchCriteria.nama);
+  }
+
+  async verifyCreatedPatientOnPatientList(snapshot: CreatedPatientSnapshot): Promise<void> {
+    await this.openPatientListAndSearchCreatedPatient(snapshot);
+    await this.verifyCreatedPatientListed(snapshot);
+  }
+
   async verifyTableDisplaysCreatedPatient(snapshot: CreatedPatientSnapshot): Promise<void> {
     await this.verifyTableDisplayed();
     await this.verifyFooterHasSearchResults();

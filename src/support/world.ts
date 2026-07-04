@@ -3,7 +3,7 @@ import { Browser, BrowserContext, Page } from "playwright";
 
 import { LoginPage } from "../pages/authentication/LoginPage";
 import { LandingPage } from "../pages/landing/LandingPage";
-import { CreatePatientPage } from "../pages/patient/CreatePatientPage";
+import { CreatePatientPage } from "../pages/patient/create-patient/CreatePatientPage";
 import { RegisterPatientPage } from "../pages/patient/RegisterPatientPage";
 import { PatientShowDetailPage } from "../pages/patient/PatientShowDetailPage";
 import { SearchPatientPage } from "../pages/patient/SearchPatientPage";
@@ -13,6 +13,7 @@ import {
   PatientFormInput,
   RegistrationSnapshot,
 } from "../types/patient.type";
+import { UserCredential } from "../types/user.type";
 
 export class CustomWorld extends World {
   browser!: Browser;
@@ -28,6 +29,8 @@ export class CustomWorld extends World {
   patientShowDetailPage!: PatientShowDetailPage;
 
   authRole?: string;
+  loggedInUser?: UserCredential;
+  journeyJenisData?: string;
   patientFormInput?: PatientFormInput;
   createdPatientSnapshot?: CreatedPatientSnapshot;
   registrationSnapshot?: RegistrationSnapshot;

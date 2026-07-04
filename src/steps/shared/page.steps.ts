@@ -1,7 +1,7 @@
 import { Then } from "@cucumber/cucumber";
 
 import { LoginPage } from "../../pages/authentication/LoginPage";
-import { CreatePatientPage } from "../../pages/patient/CreatePatientPage";
+import { CreatePatientPage } from "../../pages/patient/create-patient/CreatePatientPage";
 import { PatientShowDetailPage } from "../../pages/patient/PatientShowDetailPage";
 import { SearchPatientPage } from "../../pages/patient/SearchPatientPage";
 import { CustomWorld } from "../../support/world";
@@ -16,6 +16,7 @@ Then("user berada di halaman {string}", async function (this: CustomWorld, halam
       await this.loginPage.verifyOnHomePage();
       break;
 
+    case "Pembuatan Pasien":
     case "Create Pasien":
       if (!this.createPatientPage) {
         this.createPatientPage = new CreatePatientPage(this.page);

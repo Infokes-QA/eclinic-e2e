@@ -2,9 +2,12 @@ import { expect, Locator, Page } from "@playwright/test";
 import { ENV } from "../../config/env";
 import { UrlHelper } from "../../config/url";
 import { LoginData } from "../../data/authentication/login.data";
+import { AuthHelper } from "../../helpers/auth.helper";
 import { LoginLocator } from "../../locators/authentication/login.locator";
+import { NavbarLocator } from "../../locators/shared/navbar.locator";
 import { UserCredential } from "../../types/user.type";
 import { BasePage } from "../base/BasePage";
+import { NotifyComponent } from "../components/NotifyComponent";
 import { SweetAlertComponent } from "../components/SweetAlertComponent";
 
 export class LoginPage extends BasePage {
@@ -12,8 +15,9 @@ export class LoginPage extends BasePage {
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
-  readonly notification: Locator;
-  readonly notificationMessage: Locator;
+  readonly navbar: Locator;
+  readonly userMenu: Locator;
+  readonly notify: NotifyComponent;
   readonly sweetAlert: SweetAlertComponent;
 
   constructor(page: Page) {
@@ -23,8 +27,9 @@ export class LoginPage extends BasePage {
     this.usernameInput = page.locator(LoginLocator.loginPageEclinic.usernameInput);
     this.passwordInput = page.locator(LoginLocator.loginPageEclinic.passwordInput);
     this.loginButton = page.locator(LoginLocator.loginPageEclinic.loginButton);
-    this.notification = page.locator(LoginLocator.loginPageEclinic.notification);
-    this.notificationMessage = page.locator(LoginLocator.loginPageEclinic.notificationMessage);
+    this.navbar = page.locator(NavbarLocator.container);
+    this.userMenu = page.locator(NavbarLocator.menu.user);
+    this.notify = new NotifyComponent(page);
     this.sweetAlert = new SweetAlertComponent(page);
   }
 
@@ -32,8 +37,26 @@ export class LoginPage extends BasePage {
     await this.goTo(UrlHelper.get("login"));
   }
 
-  async verifyLoginSuccess(): Promise<void> {
+  async ensureOnLoginPage(): Promise<void> {
+    const isOnLoginPage = /\/login/.test(this.page.url());
+
+    if (!isOnLoginPage) {
+      await this.openLoginPage();
+    }
+
+    await this.verifyLoginPageDisplayed();
+  }
+
+  async openAuthenticatedHomeAs(role: string): Promise<void> {
+    await AuthHelper.openAuthenticatedHome(this.page, AuthHelper.getAuthEntryUrl(role));
+  }
+
+  async verifyLoginSuccess(user: UserCredential): Promise<void> {
     await this.expectUrlNotContains("/login", ENV.TIMEOUT);
+    await this.sweetAlert.closeIfVisible();
+    await expect(this.navbar).toBeVisible({ timeout: ENV.TIMEOUT });
+    await expect(this.userMenu).toBeVisible({ timeout: ENV.TIMEOUT });
+    await expect(this.userMenu).toContainText(user.username, { ignoreCase: true });
     await this.sweetAlert.closeIfVisible();
   }
 
@@ -50,11 +73,19 @@ export class LoginPage extends BasePage {
   }
 
   async selectClinic(clinicName: string): Promise<void> {
+    await expect(this.clinicInput).toBeVisible({ timeout: ENV.TIMEOUT });
+
+    const currentValue = ((await this.clinicInput.inputValue()) ?? "").trim();
+
+    if (currentValue.localeCompare(clinicName.trim(), undefined, { sensitivity: "accent" }) === 0) {
+      return;
+    }
+
     await this.clinicInput.click();
     await this.clinicInput.clear();
     await this.fill(this.clinicInput, clinicName);
 
-    const clinicOption = this.page.locator("li.ui-menu-item").filter({
+    const clinicOption = this.page.locator(LoginLocator.loginPageEclinic.clinicAutocompleteItem).filter({
       hasText: new RegExp(`^${escapeRegExp(clinicName)}$`, "i"),
     });
 
@@ -83,8 +114,11 @@ export class LoginPage extends BasePage {
   }
 
   async verifyLoginErrorDisplayed(): Promise<void> {
-    await this.expectVisible(this.notification);
-    await this.expectTextContains(this.notificationMessage, LoginData.message.invalidCredential);
+    await this.expectVisible(this.notify.visibleContainer());
+    await this.expectTextContains(
+      this.notify.visibleMessage(),
+      LoginData.message.invalidCredential,
+    );
     await this.expectUrlMatches(/\/login/);
   }
 

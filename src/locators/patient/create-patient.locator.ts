@@ -1,11 +1,13 @@
+import { PatientCommonLocator } from "../shared/patient-common.locator";
+
 export const CreatePatientLocator = {
   page: {
-    panelTitle: '.panel-title:has-text("Pendaftaran")',
+    panelTitle: PatientCommonLocator.pendaftaranPanelTitle,
   },
 
   actionButtonMenu: {
     fiturTunda: "#button_fitur_tunda",
-    tambah: "#button_create",
+    tambah: PatientCommonLocator.tambahButton,
     daftarLaboratorium: "#button_create_laboratorium",
     daftarRencanaKontrol: "#button_daftar_rencana_kontrol",
     print: "#print_pendaftaran",
@@ -51,40 +53,10 @@ export const CreatePatientLocator = {
     autocompleteOption: ".ui-autocomplete:visible .ui-menu-item-wrapper",
   },
 
-  placeholder: {
-    noDokumenRM: "Nomor Dokumen Rekam Medis",
-    noRMLama: "Nomor Rekam Medis Lama",
-    noKK: "Nomor KK / NIK Anggota Keluarga",
-    nik: "Nomor Induk Kependudukan (KTP)",
-    nama: "Nama lengkap",
-    tempatLahir: "Tempat lahir",
-    noHP: "Nomor HP",
-    alamatDomisili: "Alamat Domisili",
-    propinsi: "Nama Propinsi",
-    kotaKab: "Nama Kota / Kabupaten",
-    kecamatan: "Nama Kecamatan",
-    kelurahanDesa: "Nama Kelurahan / Desa",
-    pekerjaan: "Pekerjaan",
-    email: "emailpasien@email.com",
-    namaAyah: "Nama Ayah",
-    namaIbu: "Nama Ibu",
-    hubunganKeluarga: "Hubungan Keluarga",
-    negaraAsal: "Negara Asal",
-    noPaspor: "No Paspor",
-    ihsNumber: "IHS Number",
-  },
-
-  link: {
-    tambahAsuransi: "Tambah Asuransi/Penjamin",
-    inputAlamatLengkap: "Input data alamat lengkap",
-    inputDataLainnya: "Input data lainnya",
-    sembunyikan: "Sembunyikan",
-  },
-
   panelKiri: {
-    container: ".panel-kiri",
-    heading: '.panel-kiri .panel-heading:has-text("Data Pasien")',
-    table: ".panel-kiri table.table",
-    lihatSelengkapnya: '.panel-kiri a.pointer:has-text("Lihat Selengkapnya")',
+    container: PatientCommonLocator.panelKiri.container,
+    heading: PatientCommonLocator.panelKiri.heading,
+    table: PatientCommonLocator.panelKiri.table,
+    lihatSelengkapnya: PatientCommonLocator.panelKiri.expandLink,
   },
 } as const;

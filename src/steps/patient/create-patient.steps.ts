@@ -1,10 +1,11 @@
-import { Then, When } from "@cucumber/cucumber";
+import { Given, Then, When } from "@cucumber/cucumber";
 
+import { ENV } from "../../config/env";
 import { PatientFixture } from "../../fixtures/patient.fixture";
-import { CreatePatientPage } from "../../pages/patient/CreatePatientPage";
+import { CreatePatientPage } from "../../pages/patient/create-patient/CreatePatientPage";
+import { SearchPatientPage } from "../../pages/patient/SearchPatientPage";
+import { runRegisterNewPatientByJenisData } from "../../support/flows/create-patient.flow";
 import { CustomWorld } from "../../support/world";
-
-const FORM_STEP_TIMEOUT = 60_000;
 
 function ensureCreatePatientPage(world: CustomWorld): CreatePatientPage {
   if (!world.createPatientPage) {
@@ -13,6 +14,26 @@ function ensureCreatePatientPage(world: CustomWorld): CreatePatientPage {
 
   return world.createPatientPage;
 }
+
+function ensureSearchPatientPage(world: CustomWorld): SearchPatientPage {
+  if (!world.searchPatientPage) {
+    world.searchPatientPage = new SearchPatientPage(world.page);
+  }
+
+  return world.searchPatientPage;
+}
+
+Given(
+  "user berada di halaman pembuatan pasien",
+  { timeout: ENV.STEP_TIMEOUT_LONG },
+  async function (this: CustomWorld) {
+    const createPatientPage = ensureCreatePatientPage(this);
+    const { menu, submenu } = PatientFixture.createPatientNavigation;
+
+    await createPatientPage.openFromNavbar(menu, submenu);
+    await createPatientPage.verifyCreatePatientPageDisplayed();
+  },
+);
 
 When(
   "user membuka halaman Create Pasien melalui menu {string} dan submenu {string}",
@@ -83,7 +104,7 @@ When("user mengisi data pasien ringkas", async function (this: CustomWorld) {
 
 When(
   "user mengisi form Create Pasien dengan data lengkap",
-  { timeout: FORM_STEP_TIMEOUT },
+  { timeout: ENV.STEP_TIMEOUT_FORM },
   async function (this: CustomWorld) {
     const createPatientPage = ensureCreatePatientPage(this);
 
@@ -93,7 +114,7 @@ When(
 
 When(
   "user mengisi data pasien lengkap",
-  { timeout: FORM_STEP_TIMEOUT },
+  { timeout: ENV.STEP_TIMEOUT_FORM },
   async function (this: CustomWorld) {
     const createPatientPage = ensureCreatePatientPage(this);
 
@@ -115,6 +136,14 @@ When("user menyimpan data pasien", async function (this: CustomWorld) {
 
   await createPatientPage.clickSavePatientButton();
 });
+
+When(
+  "user mendaftarkan pasien baru menggunakan data {string}",
+  { timeout: ENV.STEP_TIMEOUT_LONG },
+  async function (this: CustomWorld, jenisData: string) {
+    await runRegisterNewPatientByJenisData(this, jenisData);
+  },
+);
 
 Then("form Create Pasien terisi dengan data pasien", async function (this: CustomWorld) {
   if (!this.patientFormInput) {
@@ -163,6 +192,53 @@ Then("data pasien berhasil tersimpan", async function (this: CustomWorld) {
   await createPatientPage.verifySaveAlertSuccess();
 });
 
+Then("sistem berhasil menyimpan data pasien", async function (this: CustomWorld) {
+  if (!this.patientFormInput || !this.createdPatientSnapshot) {
+    throw new Error(
+      "Data pasien belum tersedia. Jalankan step pembuatan pasien terlebih dahulu.",
+    );
+  }
+
+  const createPatientPage = ensureCreatePatientPage(this);
+
+  await createPatientPage.verifyPatientSavedSuccess(
+    this.patientFormInput,
+    this.createdPatientSnapshot,
+  );
+});
+
+Then(
+  "data pasien tersedia pada daftar pasien",
+  { timeout: ENV.STEP_TIMEOUT_LONG },
+  async function (this: CustomWorld) {
+    if (!this.createdPatientSnapshot) {
+      throw new Error(
+        "Data pasien yang dibuat belum tersedia. Jalankan step pembuatan pasien terlebih dahulu.",
+      );
+    }
+
+    const searchPatientPage = ensureSearchPatientPage(this);
+
+    await searchPatientPage.verifyCreatedPatientOnPatientList(this.createdPatientSnapshot);
+  },
+);
+
+Then(
+  "data pasien yang tersimpan sesuai dengan data yang diinput",
+  { timeout: ENV.STEP_TIMEOUT_FORM },
+  async function (this: CustomWorld) {
+    if (!this.createdPatientSnapshot) {
+      throw new Error(
+        "Data pasien yang dibuat belum tersedia. Jalankan step pembuatan pasien terlebih dahulu.",
+      );
+    }
+
+    const searchPatientPage = ensureSearchPatientPage(this);
+
+    await searchPatientPage.verifyTableDisplaysCreatedPatient(this.createdPatientSnapshot);
+  },
+);
+
 Then("user berada di halaman pendaftaran create", async function (this: CustomWorld) {
   const createPatientPage = ensureCreatePatientPage(this);
 
@@ -171,7 +247,7 @@ Then("user berada di halaman pendaftaran create", async function (this: CustomWo
 
 Then(
   "halaman pendaftaran menampilkan data pasien yang dibuat",
-  { timeout: FORM_STEP_TIMEOUT },
+  { timeout: ENV.STEP_TIMEOUT_FORM },
   async function (this: CustomWorld) {
     if (!this.patientFormInput) {
       throw new Error("Data pasien belum tersedia. Jalankan step pengisian form terlebih dahulu.");

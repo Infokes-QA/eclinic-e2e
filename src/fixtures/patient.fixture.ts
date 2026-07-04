@@ -1,6 +1,36 @@
-import { CreatePatientData } from "../data/patient/create-patient.data";
 import { RandomHelper } from "../helpers/random.helper";
 import { PatientFormInput, PatientIdentity } from "../types/patient.type";
+
+export const PatientFormDefaults = {
+  wargaNegara: "INDONESIA",
+  alamatLengkap: {
+    rt: "001",
+    rw: "002",
+    propinsi: "JAWA BARAT",
+    kotaKab: "KOTA BANDUNG",
+    kecamatan: "BUAHBATU",
+    kelurahanDesa: "SEKEJATI",
+  },
+  patientIdentity: {
+    namePrefix: "Pasien Auto",
+    fatherLabel: "Ayah",
+    motherLabel: "Ibu",
+    emailPrefix: "PasienAuto",
+    emailDomain: "yopmail.com",
+    sequenceLength: 3,
+  },
+} as const;
+
+export const RegisterFormDefaults = {
+  waktuKunjungan: "Hari ini",
+  kunjungan: "BARU",
+  jenisKunjunganSakit: "SAKIT",
+  jenisKunjunganSehat: "SEHAT",
+  penjamin: "umum",
+  instalasi: "Rawat Jalan",
+  poliRuangan: "Poli Umum - Pagi",
+  skriningVisual: "Pasien stabil",
+} as const;
 
 function buildBaseRandomInput(identity?: PatientIdentity): Omit<PatientFormInput, "alamatLengkap" | "dataLainnya"> {
   const patientIdentity = identity ?? RandomHelper.generatePatientIdentity();
@@ -14,7 +44,7 @@ function buildBaseRandomInput(identity?: PatientIdentity): Omit<PatientFormInput
     tempatLahir: RandomHelper.generateBirthPlace(),
     alamatDomisili: RandomHelper.generateAddress(),
     jenisKelamin: RandomHelper.generateGender(),
-    wargaNegara: CreatePatientData.defaults.wargaNegara,
+    wargaNegara: PatientFormDefaults.wargaNegara,
     golonganDarah: RandomHelper.generateGolonganDarah(),
   };
 }
@@ -50,7 +80,7 @@ export const PatientFixture = {
     },
   } as const,
 
-  defaultWargaNegara: CreatePatientData.defaults.wargaNegara,
+  defaultWargaNegara: PatientFormDefaults.wargaNegara,
   defaultInsuranceName: "umum" as const,
 
   buildRandomInputRingkas(): PatientFormInput {
@@ -64,14 +94,12 @@ export const PatientFixture = {
       ...buildBaseRandomInput(patientIdentity),
       insuranceName: PatientFixture.defaultInsuranceName,
       alamatLengkap: {
-        // rt: RandomHelper.generateRtRw(),
-        // rw: RandomHelper.generateRtRw(),
-        rt: CreatePatientData.alamatLengkap.rt,
-        rw: CreatePatientData.alamatLengkap.rw,
-        propinsi: CreatePatientData.alamatLengkap.propinsi,
-        kotaKab: CreatePatientData.alamatLengkap.kotaKab,
-        kecamatan: CreatePatientData.alamatLengkap.kecamatan,
-        kelurahanDesa: CreatePatientData.alamatLengkap.kelurahanDesa,
+        rt: PatientFormDefaults.alamatLengkap.rt,
+        rw: PatientFormDefaults.alamatLengkap.rw,
+        propinsi: PatientFormDefaults.alamatLengkap.propinsi,
+        kotaKab: PatientFormDefaults.alamatLengkap.kotaKab,
+        kecamatan: PatientFormDefaults.alamatLengkap.kecamatan,
+        kelurahanDesa: PatientFormDefaults.alamatLengkap.kelurahanDesa,
       },
       dataLainnya: {
         agama: RandomHelper.generateAgama(),

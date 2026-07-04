@@ -1,8 +1,10 @@
+import { PatientCommonLocator } from "../shared/patient-common.locator";
+
 export const RegisterPatientLocator = {
   page: {
-    panelTitle: '.panel-title:has-text("Pendaftaran")',
+    panelTitle: PatientCommonLocator.pendaftaranPanelTitle,
     listPanelTitle: '.panel-title:has-text("Pendaftaran Pasien")',
-    tambah: "#button_create",
+    tambah: PatientCommonLocator.tambahButton,
   },
 
   patientSearch: {
@@ -14,9 +16,9 @@ export const RegisterPatientLocator = {
   },
 
   panelKiri: {
-    container: ".panel-kiri",
-    heading: '.panel-kiri .panel-heading:has-text("Data Pasien")',
-    table: ".panel-kiri table.table",
+    container: PatientCommonLocator.panelKiri.container,
+    heading: PatientCommonLocator.panelKiri.heading,
+    table: PatientCommonLocator.panelKiri.table,
   },
 
   pelayanan: {
@@ -60,13 +62,13 @@ export const RegisterPatientLocator = {
   },
 
   list: {
-    wrapper: "#datatableWrapper",
-    searchForm: "#form_search",
+    wrapper: PatientCommonLocator.datatable.wrapper,
+    searchForm: PatientCommonLocator.datatable.searchForm,
     searchInput: '#form_search input[name="searchKey"]',
     searchButton: "#button_cari",
     statusPeriksaSelect: "#status_periksa",
     ruanganSelect: '#form_search select[name="ruangan_id"]',
-    table: "#datatableWrapper table.datatable",
-    tableBodyRow: "#datatableWrapper table.datatable tbody tr",
+    table: PatientCommonLocator.datatable.table,
+    tableBodyRow: PatientCommonLocator.datatable.bodyRow,
   },
 } as const;

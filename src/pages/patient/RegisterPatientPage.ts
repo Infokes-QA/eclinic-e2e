@@ -3,10 +3,11 @@ import { expect, Locator, Page } from "@playwright/test";
 import { ENV } from "../../config/env";
 import { CreatePatientData } from "../../data/patient/create-patient.data";
 import { RegisterPatientData } from "../../data/patient/register-patient.data";
-import { PatientFixture } from "../../fixtures/patient.fixture";
+import { PatientFixture, RegisterFormDefaults } from "../../fixtures/patient.fixture";
 import { RandomHelper } from "../../helpers/random.helper";
+import { panelKiriTableRowByLabel, panelKiriValueCell } from "../../helpers/patient-panel.helper";
 import { RegisterPatientLocator } from "../../locators/patient/register-patient.locator";
-import { RegistrationSnapshot } from "../../types/patient.type";
+import { CreatedPatientSnapshot, RegistrationSnapshot } from "../../types/patient.type";
 import { BasePage } from "../base/BasePage";
 import { NavbarComponent } from "../components/NavbarComponent";
 import { SweetAlertComponent } from "../components/SweetAlertComponent";
@@ -200,6 +201,21 @@ export class RegisterPatientPage extends BasePage {
     await expect(this.suggestItem.first()).toBeVisible({ timeout: ENV.TIMEOUT });
   }
 
+  async searchCreatedPatientByCriteria(
+    criteria: string,
+    snapshot: CreatedPatientSnapshot,
+  ): Promise<void> {
+    const normalizedCriteria = criteria.toLowerCase();
+
+    if (normalizedCriteria !== "nama" && normalizedCriteria !== "nik") {
+      throw new Error(`Kriteria pencarian pendaftaran '${criteria}' belum didukung.`);
+    }
+
+    const keyword = normalizedCriteria === "nik" ? snapshot.nik : snapshot.nama;
+
+    await this.searchExistingPatient(keyword);
+  }
+
   async selectExistingPatientFromSuggest(expectedName: string): Promise<void> {
     if (await this.isPatientDisplayedInPanel(expectedName)) {
       await this.waitForPelayananFormReady();
@@ -207,7 +223,7 @@ export class RegisterPatientPage extends BasePage {
     }
 
     const namePattern = new RegExp(escapeRegExp(expectedName), "i");
-    const item = this.suggestDropdown.locator(".sfg-item").filter({ hasText: namePattern }).first();
+    const item = this.suggestItem.filter({ hasText: namePattern }).first();
 
     await expect(item).toBeVisible({ timeout: ENV.TIMEOUT });
     await item.scrollIntoViewIfNeeded();
@@ -242,10 +258,8 @@ export class RegisterPatientPage extends BasePage {
     await this.expectVisible(this.panelKiriTable);
 
     const label = CreatePatientData.panelKiri.labels.namaLengkap;
-    const row = this.panelKiriTable.locator("tr").filter({
-      has: this.page.getByRole("cell", { name: label, exact: true }),
-    });
-    const valueCell = row.locator("td").nth(1);
+    const row = panelKiriTableRowByLabel(this.panelKiriTable, this.page, label);
+    const valueCell = panelKiriValueCell(row);
 
     await expect(valueCell).toBeVisible({ timeout: ENV.TIMEOUT });
 
@@ -284,7 +298,7 @@ export class RegisterPatientPage extends BasePage {
   }
 
   async fillPelayananFormKunjunganSakit(): Promise<void> {
-    const defaults = RegisterPatientData.pelayanan.defaults;
+    const defaults = RegisterFormDefaults;
 
     await this.expectVisible(this.pelayananHeading);
     await this.prepareKunjunganFormDefaults();
@@ -296,7 +310,7 @@ export class RegisterPatientPage extends BasePage {
   }
 
   async prepareKunjunganFormDefaults(): Promise<void> {
-    const defaults = RegisterPatientData.pelayanan.defaults;
+    const defaults = RegisterFormDefaults;
 
     await this.expectVisible(this.pelayananHeading);
     await this.selectWaktuKunjunganHariIni();
@@ -428,20 +442,16 @@ export class RegisterPatientPage extends BasePage {
   }
 
   private async selectJenisKunjunganSehat(): Promise<void> {
-    const kunjunganSehatRadio = this.page.getByRole("radio", { name: "Kunjungan Sehat", exact: true });
-
     if (!(await this.kunjunganSehat.isChecked())) {
-      await kunjunganSehatRadio.check();
+      await this.kunjunganSehat.check();
     }
 
     await expect(this.kunjunganSehat).toBeChecked();
   }
 
   private async selectJenisKunjunganSakit(): Promise<void> {
-    const kunjunganSakitRadio = this.page.getByRole("radio", { name: "Kunjungan Sakit", exact: true });
-
     if (!(await this.kunjunganSakit.isChecked())) {
-      await kunjunganSakitRadio.check();
+      await this.kunjunganSakit.check();
     }
 
     await expect(this.kunjunganSakit).toBeChecked();
@@ -476,10 +486,8 @@ export class RegisterPatientPage extends BasePage {
   private async selectSkriningVisualIfNeeded(skriningValue: string): Promise<void> {
     void skriningValue;
 
-    const skriningRadio = this.page.getByRole("radio", { name: "Pasien stabil", exact: true });
-
     if (!(await this.skriningVisualPasienStabil.isChecked())) {
-      await skriningRadio.check();
+      await this.skriningVisualPasienStabil.check();
     }
 
     await expect(this.skriningVisualPasienStabil).toBeChecked();
