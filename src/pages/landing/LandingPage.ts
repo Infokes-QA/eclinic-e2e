@@ -1,10 +1,10 @@
 import { expect, Locator, Page } from "@playwright/test";
 
 import { ENV } from "../../config/env";
-import { LandingPageLocator } from "../../locators/landing/landing.locator";
+import { LandingLocator } from "../../locators/landing/landing.locator";
 import { BasePage } from "../base/BasePage";
 
-type LandingMenu = keyof typeof LandingPageLocator.menu;
+type LandingMenu = keyof typeof LandingLocator.menu;
 
 export class LandingPage extends BasePage {
   readonly patientManagementMenu: Locator;
@@ -14,12 +14,12 @@ export class LandingPage extends BasePage {
   constructor(page: Page) {
     super(page);
 
-    this.patientManagementMenu = page.locator(LandingPageLocator.menu.patientManagement.title);
+    this.patientManagementMenu = page.locator(LandingLocator.menu.patientManagement.title);
 
-    this.programManagementMenu = page.locator(LandingPageLocator.menu.programManagement.title);
+    this.programManagementMenu = page.locator(LandingLocator.menu.programManagement.title);
 
     this.organizationManagementMenu = page.locator(
-      LandingPageLocator.menu.organizationManagement.title,
+      LandingLocator.menu.organizationManagement.title,
     );
   }
 
@@ -55,14 +55,14 @@ export class LandingPage extends BasePage {
   }
 
   private getMenu(menu: string) {
-    if (!(menu in LandingPageLocator.menu)) {
+    if (!(menu in LandingLocator.menu)) {
       throw new Error(
         `Menu '${menu}' tidak ditemukan. Available menu: ${Object.keys(
-          LandingPageLocator.menu,
+          LandingLocator.menu,
         ).join(", ")}`,
       );
     }
 
-    return LandingPageLocator.menu[menu as LandingMenu];
+    return LandingLocator.menu[menu as LandingMenu];
   }
 }

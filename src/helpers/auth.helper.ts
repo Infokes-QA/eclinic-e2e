@@ -172,7 +172,7 @@ export class AuthHelper {
       await loginPage.openLoginPage();
       await loginPage.verifyLoginPageDisplayed();
       await loginPage.loginAs(user);
-      await loginPage.verifyLoginSuccess();
+      await loginPage.verifyLoginSuccess(user);
 
       return await this.captureSessionAfterLogin(page, role);
     } finally {

@@ -1,5 +1,7 @@
 import { PatientFixture } from "../../fixtures/patient.fixture";
-import { CreatePatientPage } from "../../pages/patient/CreatePatientPage";
+import { CreatePatientPage } from "../../pages/patient/create-patient/CreatePatientPage";
+import { CreatePatientData } from "../../data/patient/create-patient.data";
+import { runRegisterNewPatientByJenisData } from "./create-patient.flow";
 import { CustomWorld } from "../world";
 
 function ensureCreatePatientPage(world: CustomWorld): CreatePatientPage {
@@ -15,18 +17,5 @@ export async function runCreatePatientLengkapFlow(world: CustomWorld): Promise<v
   const { menu, submenu } = PatientFixture.createPatientNavigation;
 
   await createPatientPage.openFromNavbar(menu, submenu);
-  await createPatientPage.openCreatePatientModal();
-  world.patientFormInput = await createPatientPage.fillPatientFormWithFakeDataLengkap();
-  await createPatientPage.clickSavePatientButton();
-  await createPatientPage.verifySaveAlertSuccess();
-  await createPatientPage.verifyOnCreateRegistrationPage();
-
-  if (!world.patientFormInput) {
-    throw new Error("Data pasien belum tersedia setelah pembuatan pasien.");
-  }
-
-  await createPatientPage.verifyPatientPanelKiri(world.patientFormInput);
-  world.createdPatientSnapshot = await createPatientPage.captureCreatedPatientSnapshot(
-    world.patientFormInput,
-  );
+  await runRegisterNewPatientByJenisData(world, CreatePatientData.jenisData.lengkap);
 }

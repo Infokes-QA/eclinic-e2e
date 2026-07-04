@@ -42,6 +42,10 @@ export const ENV = {
 
   TIMEOUT: Number(process.env.TIMEOUT) || 15000,
 
+  STEP_TIMEOUT_FORM: Number(process.env.STEP_TIMEOUT_FORM) || 60_000,
+
+  STEP_TIMEOUT_LONG: Number(process.env.STEP_TIMEOUT_LONG) || 120_000,
+
   OPTIONAL_DIALOG_TIMEOUT: Number(process.env.OPTIONAL_DIALOG_TIMEOUT) || 2000,
 
   AUTH_STATE_MAX_AGE_HOURS: Number(process.env.AUTH_STATE_MAX_AGE_HOURS) || 24,

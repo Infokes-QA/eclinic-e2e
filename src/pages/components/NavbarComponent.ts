@@ -1,6 +1,7 @@
 import { expect, Locator, Page } from "@playwright/test";
 
 import { NavbarLocator, NavbarMenu } from "../../locators/shared/navbar.locator";
+import { SweetAlertComponent } from "./SweetAlertComponent";
 
 type NavbarSubmenuGroup = Omit<typeof NavbarLocator, "container" | "menu">;
 type NavbarSubmenuGroupName = keyof NavbarSubmenuGroup;
@@ -29,6 +30,8 @@ export class NavbarComponent {
     groupName: GroupName,
     submenuName: NavbarSubmenuName<GroupName>,
   ): Promise<void> {
+    await new SweetAlertComponent(this.page).closeIfVisible();
+
     const menuLocator = pageLocator(this.page, NavbarLocator.menu[groupName as NavbarMenu]);
     const submenuSelector = NavbarLocator[groupName][submenuName] as string;
     const submenuLocator = pageLocator(this.page, submenuSelector);

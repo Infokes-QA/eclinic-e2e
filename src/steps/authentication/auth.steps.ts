@@ -1,6 +1,5 @@
 import { Given, Then } from "@cucumber/cucumber";
 
-import { AuthHelper } from "../../helpers/auth.helper";
 import { LoginPage } from "../../pages/authentication/LoginPage";
 import { CustomWorld } from "../../support/world";
 
@@ -15,10 +14,10 @@ Given("user sudah login sebagai {string}", async function (this: CustomWorld, ro
     throw new Error(`Role scenario '${this.authRole}' tidak cocok dengan role step '${role}'.`);
   }
 
-  await AuthHelper.openAuthenticatedHome(this.page, AuthHelper.getAuthEntryUrl(role));
-
-  this.loginPage = new LoginPage(this.page);
-  await this.loginPage.verifyOnHomePage();
+  const loginPage = new LoginPage(this.page);
+  await loginPage.openAuthenticatedHomeAs(role);
+  this.loginPage = loginPage;
+  await loginPage.verifyOnHomePage();
 });
 
 Then("user berada di halaman Home", async function (this: CustomWorld) {

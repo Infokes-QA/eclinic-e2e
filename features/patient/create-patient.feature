@@ -7,7 +7,7 @@ Feature: Pembuatan Pasien
   @smoke @patient @positive
   Scenario: User dapat membuka halaman pembuatan pasien
     When user membuka halaman pembuatan pasien
-    Then user berada di halaman "Create Pasien"
+    Then user berada di halaman "Pembuatan Pasien"
 
   @regression @patient @positive
   Scenario: User dapat membuat pasien dengan data ringkas
@@ -26,3 +26,15 @@ Feature: Pembuatan Pasien
     And user menyimpan data pasien
     Then data pasien berhasil tersimpan
     And halaman pendaftaran menampilkan data pasien yang dibuat
+
+  @regression @patient @positive @create-pasien-lengkap
+  Scenario Outline: Pembuatan pasien baru dengan data lengkap
+    Given user berada di halaman pembuatan pasien
+    When user mendaftarkan pasien baru menggunakan data "<jenisData>"
+    Then sistem berhasil menyimpan data pasien
+    And data pasien tersedia pada daftar pasien
+    And data pasien yang tersimpan sesuai dengan data yang diinput
+
+    Examples:
+      | jenisData |
+      | lengkap   |
