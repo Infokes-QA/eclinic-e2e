@@ -1,8 +1,8 @@
-import { Given, When, Then } from "@cucumber/cucumber";
+import { Given, Then, When } from "@cucumber/cucumber";
 
-import { LandingPage } from "../../pages/landing/LandingPage";
-import { LoginPage } from "../../pages/authentication/LoginPage";
-import { CustomWorld } from "../../support/world";
+import { LoginPage } from "../pages/authentication/LoginPage";
+import { LandingPage } from "../pages/landing/LandingPage";
+import { CustomWorld } from "../support/world";
 
 Given("user berada di halaman Landing Page", async function (this: CustomWorld) {
   this.landingPage = new LandingPage(this.page);
