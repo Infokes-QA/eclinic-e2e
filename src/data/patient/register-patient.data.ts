@@ -29,6 +29,7 @@ export const RegisterPatientData = {
 
   jenisData: {
     lengkap: "lengkap",
+    ringkas: "ringkas"
   } as const,
 
   jenisKunjungan: {

@@ -19,3 +19,11 @@ export async function runCreatePatientLengkapFlow(world: CustomWorld): Promise<v
   await createPatientPage.openFromNavbar(menu, submenu);
   await runRegisterNewPatientByJenisData(world, CreatePatientData.jenisData.lengkap);
 }
+
+export async function runCreatePatientRingkasFlow(world: CustomWorld): Promise<void> {
+  const createPatientPage = ensureCreatePatientPage(world);
+  const { menu, submenu } = PatientFixture.createPatientNavigation;
+
+  await createPatientPage.openFromNavbar(menu, submenu);
+  await runRegisterNewPatientByJenisData(world, CreatePatientData.jenisData.ringkas);
+}

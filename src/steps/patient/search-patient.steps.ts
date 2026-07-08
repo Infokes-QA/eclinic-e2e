@@ -12,14 +12,11 @@ function ensureSearchPatientPage(world: CustomWorld): SearchPatientPage {
   return world.searchPatientPage;
 }
 
-When(
-  "user membuka halaman Pasien melalui menu {string} dan submenu {string}",
-  async function (this: CustomWorld, menu: string, submenu: string) {
-    const searchPatientPage = ensureSearchPatientPage(this);
+When("user membuka halaman Pasien melalui menu {string} dan submenu {string}", async function (this: CustomWorld, menu: string, submenu: string) {
+  const searchPatientPage = ensureSearchPatientPage(this);
 
-    await searchPatientPage.openFromNavbar(menu, submenu);
-  },
-);
+  await searchPatientPage.openFromNavbar(menu, submenu);
+});
 
 When("user membuka halaman pasien", async function (this: CustomWorld) {
   const searchPatientPage = ensureSearchPatientPage(this);
@@ -34,52 +31,41 @@ When("user mencari pasien dengan kata kunci {string}", async function (this: Cus
   await searchPatientPage.searchPatient(keyword);
 });
 
-When(
-  "user mencari pasien yang baru dibuat berdasarkan {string}",
-  async function (this: CustomWorld, criteria: string) {
-    if (!this.createdPatientSnapshot) {
-      throw new Error(
-        "Data pasien yang dibuat belum tersedia. Jalankan step create pasien terlebih dahulu.",
-      );
-    }
+When("user mencari pasien yang baru dibuat berdasarkan {string}", async function (this: CustomWorld, criteria: string) {
+  if (!this.createdPatientSnapshot) {
+    throw new Error(
+      "Data pasien yang dibuat belum tersedia. Jalankan step create pasien terlebih dahulu.",
+    );
+  }
 
-    const searchPatientPage = ensureSearchPatientPage(this);
+  const searchPatientPage = ensureSearchPatientPage(this);
 
-    await searchPatientPage.searchCreatedPatient(this.createdPatientSnapshot, criteria);
-  },
-);
+  await searchPatientPage.searchCreatedPatient(this.createdPatientSnapshot, criteria);
+});
 
-When(
-  "user memfilter data pasien dengan tipe record {string} verifikasi {string} dan general consent {string}",
-  async function (
-    this: CustomWorld,
-    typeRecord: string,
-    verification: string,
-    generalConsent: string,
-  ) {
-    const searchPatientPage = ensureSearchPatientPage(this);
+When("user memfilter data pasien dengan tipe record {string} verifikasi {string} dan general consent {string}",
+async function (
+  this: CustomWorld,
+  typeRecord: string,
+  verification: string,
+  generalConsent: string,
+) {
+  const searchPatientPage = ensureSearchPatientPage(this);
 
-    await searchPatientPage.applyPatientFilters(typeRecord, verification, generalConsent);
-  },
-);
+  await searchPatientPage.applyPatientFilters(typeRecord, verification, generalConsent);
+});
 
-When(
-  "user memfilter data pasien dengan tanggal lahir {string}",
-  async function (this: CustomWorld, birthDate: string) {
-    const searchPatientPage = ensureSearchPatientPage(this);
+When("user memfilter data pasien dengan tanggal lahir {string}", async function (this: CustomWorld, birthDate: string) {
+  const searchPatientPage = ensureSearchPatientPage(this);
 
-    await searchPatientPage.filterByBirthDate(birthDate);
-  },
-);
+  await searchPatientPage.filterByBirthDate(birthDate);
+});
 
-When(
-  "user menampilkan {string} data per halaman pada tabel Pasien",
-  async function (this: CustomWorld, limitPerPage: string) {
-    const searchPatientPage = ensureSearchPatientPage(this);
+When("user menampilkan {string} data per halaman pada tabel Pasien", async function (this: CustomWorld, limitPerPage: string) {
+  const searchPatientPage = ensureSearchPatientPage(this);
 
-    await searchPatientPage.selectLimitPerPage(limitPerPage);
-  },
-);
+  await searchPatientPage.selectLimitPerPage(limitPerPage);
+});
 
 When("user menekan tombol Cari pada halaman Pasien", async function (this: CustomWorld) {
   const searchPatientPage = ensureSearchPatientPage(this);
@@ -99,14 +85,11 @@ Then("form filter Pasien ditampilkan", async function (this: CustomWorld) {
   await searchPatientPage.verifySearchFormDisplayed();
 });
 
-Then(
-  "tabel Pasien menampilkan hasil yang mengandung {string}",
-  async function (this: CustomWorld, expected: string) {
-    const searchPatientPage = ensureSearchPatientPage(this);
+Then("tabel Pasien menampilkan hasil yang mengandung {string}", async function (this: CustomWorld, expected: string) {
+  const searchPatientPage = ensureSearchPatientPage(this);
 
-    await searchPatientPage.verifyTableContainsText(expected);
-  },
-);
+  await searchPatientPage.verifyTableContainsText(expected);
+});
 
 Then("tabel Pasien menampilkan pasien yang baru dibuat", async function (this: CustomWorld) {
   if (!this.createdPatientSnapshot) {
@@ -126,11 +109,9 @@ Then("tabel Pasien menampilkan data hasil filter", async function (this: CustomW
   await searchPatientPage.verifyFilterResultsDisplayed();
 });
 
-Then(
-  "tabel Pasien menampilkan maksimal {string} baris data",
-  async function (this: CustomWorld, limitPerPage: string) {
-    const searchPatientPage = ensureSearchPatientPage(this);
+Then("tabel Pasien menampilkan maksimal {string} baris data",
+async function (this: CustomWorld, limitPerPage: string) {
+  const searchPatientPage = ensureSearchPatientPage(this);
 
-    await searchPatientPage.verifyTableRowCountAtMost(Number(limitPerPage));
-  },
-);
+  await searchPatientPage.verifyTableRowCountAtMost(Number(limitPerPage));
+});

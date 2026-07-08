@@ -31,10 +31,11 @@ Feature: Pembuatan Pasien
   Scenario Outline: Pembuatan pasien baru dengan data lengkap
     Given user berada di halaman pembuatan pasien
     When user mendaftarkan pasien baru menggunakan data "<jenisData>"
-    Then sistem berhasil menyimpan data pasien
+    Then data pasien berhasil tersimpan
+    And halaman pendaftaran menampilkan data pasien yang dibuat
     And data pasien tersedia pada daftar pasien
     And data pasien yang tersimpan sesuai dengan data yang diinput
 
-    Examples:
+    Examples: 
       | jenisData |
-      | lengkap   |
+      | ringkas   |

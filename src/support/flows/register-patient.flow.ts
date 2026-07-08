@@ -4,7 +4,7 @@ import { RegisterFormDefaults } from "../../fixtures/patient.fixture";
 import { RegisterPatientPage } from "../../pages/patient/RegisterPatientPage";
 import { RegistrationSnapshot } from "../../types/patient.type";
 import { CustomWorld } from "../world";
-import { runCreatePatientLengkapFlow } from "./create-patient-lengkap.flow";
+import { runCreatePatientLengkapFlow, runCreatePatientRingkasFlow } from "./create-patient-lengkap.flow";
 
 export async function verifyRegistrationWithAlertDiagnostic(
   world: CustomWorld,
@@ -31,9 +31,16 @@ export async function ensurePatientRegisteredByJenisData(
   world: CustomWorld,
   jenisData: string,
 ): Promise<void> {
-  if (jenisData === RegisterPatientData.jenisData.lengkap) {
+  if (jenisData == RegisterPatientData.jenisData.lengkap) {
     if (!world.createdPatientSnapshot) {
       await runCreatePatientLengkapFlow(world);
+    }
+
+    world.registrationSnapshot = initRegistrationSnapshotFromCreatedPatient(world);
+    return;
+  } else if (jenisData == RegisterPatientData.jenisData.ringkas) {
+    if (!world.createdPatientSnapshot) {
+      await runCreatePatientRingkasFlow(world);
     }
 
     world.registrationSnapshot = initRegistrationSnapshotFromCreatedPatient(world);

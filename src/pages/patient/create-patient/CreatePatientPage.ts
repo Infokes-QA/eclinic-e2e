@@ -244,6 +244,10 @@ export class CreatePatientPage extends BasePage {
     return this.modal.fillPatientFormWithFakeDataLengkap();
   }
 
+  async fillPatientFormWithConditionalData(jenisData: string): Promise<PatientFormInput> {
+    return this.modal.fillPatientFormWithConditionalData(jenisData);
+  }
+
   async clickSavePatientButton(): Promise<void> {
     return this.modal.clickSavePatientButton();
   }

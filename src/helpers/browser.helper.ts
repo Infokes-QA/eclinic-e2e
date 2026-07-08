@@ -34,10 +34,7 @@ export class BrowserHelper {
     return await browser.launch(launchOptions);
   }
 
-  static async createContext(
-    browser: Browser,
-    storageStatePath?: string,
-  ): Promise<BrowserContext> {
+  static async createContext(browser: Browser, storageStatePath?: string): Promise<BrowserContext> {
     return await browser.newContext({
       storageState: storageStatePath,
       viewport: {

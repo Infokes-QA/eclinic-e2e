@@ -1,9 +1,6 @@
 Feature: Authentication
 
-  Background:
-    Given user berada di halaman Landing Page
-
-  @user-journey @login @positive
+  @user-journey @login-admin @positive
   Scenario: Login berhasil menggunakan akun Admin
     Given user sudah berada di halaman Login
     When user login menggunakan akun "admin"

@@ -13,14 +13,11 @@ When("user hover menu {string}", async function (this: CustomWorld, menu: string
   await this.landingPage.hoverMenu(menu);
 });
 
-When(
-  "user memilih submenu {string} pada menu {string}",
-  async function (this: CustomWorld, submenu: string, menu: string) {
-    await this.landingPage.clickSubmenu(menu, submenu);
-  },
-);
+When("user memilih submenu {string} pada menu {string}", async function (this: CustomWorld, submenu: string, menu: string) {
+  await this.landingPage.clickSubmenu(menu, submenu);
+});
 
 Then("user berada di halaman Login", async function (this: CustomWorld) {
   this.loginPage = new LoginPage(this.page);
   await this.loginPage.verifyLoginPageDisplayed();
-}); 
+});

@@ -103,6 +103,7 @@ export const CreatePatientData = {
 
   jenisData: {
     lengkap: "lengkap",
+    ringkas: "ringkas",
   } as const,
 } as const;
 

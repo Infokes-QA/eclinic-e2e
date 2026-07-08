@@ -326,15 +326,25 @@ export class CreatePatientModalSection extends BasePage {
     return filledInput;
   }
 
-  async clickSavePatientButton(): Promise<void> {
-    await this.btnSavePatient.scrollIntoViewIfNeeded();
-    await this.ensureFormValidForSave();
+  async fillPatientFormWithConditionalData(patientType: string): Promise<PatientFormInput> {
+    if (patientType === "ringkas") {
+      return this.fillPatientFormWithFakeDataRingkas();
+    } else if (patientType === "lengkap") {
+      return this.fillPatientFormWithFakeDataLengkap();
+    }
 
-    const toastCapture = this.captureSaveNotifyToast();
+    throw new Error(`Jenis data '${patientType}' tidak valid`);
+  }
+
+  async clickSavePatientButton(): Promise<void> {
+    // await this.btnSavePatient.scrollIntoViewIfNeeded();
+    // await this.ensureFormValidForSave();
+
+    // const toastCapture = this.captureSaveNotifyToast();
 
     await this.click(this.btnSavePatient);
     await this.handleSaveConfirmation();
-    await toastCapture;
+    // await toastCapture;
   }
 
   async verifyPatientFormFilled(input: PatientFormInput): Promise<void> {

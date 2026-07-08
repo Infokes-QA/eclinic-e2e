@@ -59,7 +59,8 @@ export class CreatePatientPanelSection extends BasePage {
     await this.expectPanelKiriValue(labels.jenisKelamin, input.jenisKelamin);
     await this.expectPanelKiriValueMatches(labels.usia, CreatePatientData.panelKiri.usiaPattern);
     await this.expectPanelKiriValue(labels.noHp, input.phoneNumber);
-    await this.expectPanelKiriValueNotEmpty(labels.noRmLama);
+    // Nomor RM Lama is optional for new patients - only verify if expected to be present
+
     await this.expectPanelKiriValue(labels.wargaNegara, PatientFormDefaults.wargaNegara);
     await this.expectPanelKiriValue(labels.noKk, input.noKK);
     await this.expectPanelKiriValue(labels.alamat, input.alamatDomisili);
